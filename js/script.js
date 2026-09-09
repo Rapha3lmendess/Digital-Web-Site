@@ -16,7 +16,7 @@
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const SUPABASE_URL = "https://thmtriwgvsgxdinsuxph.supabase.co";
-const SUPABASE_KEY = "COLOQUE_AQUI_A_CHAVE_ANON_PUBLIC_DO_SUPABASE";
+const SUPABASE_KEY = "sb_secret_X8Q27lrHKVTkjQ992uQ95w_lDLYbsqr";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -51,9 +51,9 @@ if (formCadastro) {
         mostrarMensagem(mensagem, "Criando conta...", "#ffffff");
 
         const { data: usuarioExistente, error: erroBusca } = await supabase
-            .from("Usuario")
-            .select("nome_usuario")
-            .eq("nome_usuario", usuario)
+            .from("senha")
+            .select("usuario")
+            .eq("usuario", usuario)
             .maybeSingle();
 
         if (erroBusca) {
@@ -68,11 +68,11 @@ if (formCadastro) {
         }
 
         const { error: erroCadastro } = await supabase
-            .from("Usuario")
+            .from("senha")
             .insert({
-                nome_usuario: usuario,
-                email_usuario: email,
-                senha_usuario: senha
+                usuario: usuario,
+                email: email,
+                senha: senha
             });
 
         if (erroCadastro) {
