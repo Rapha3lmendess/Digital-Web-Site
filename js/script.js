@@ -8,19 +8,23 @@
     - Verificacao de senha
     - Redirecionamento
 
-    Os usuarios sao armazenados na tabela "senha"
+    Os usuarios sao armazenados na tabela "Usuario"
     do Supabase.
 ====================================================
 */
 
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import {
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+} from "./supabase-config.js";
 
-const SUPABASE_URL = "https://thmtriwgvsgxdinsuxph.supabase.co";
-const SUPABASE_KEY = "sb_publishable_UEFgvCGMxI5rGKZ0ac8OsA_xV_Sgy4h";
+const USUARIO_LOGADO_KEY = "usuarioLogadoEmail";
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 function mostrarMensagem(elemento, texto, cor) {
+    if (!elemento) return;
     elemento.innerText = texto;
     elemento.style.color = cor;
 }
@@ -37,11 +41,16 @@ if (formCadastro) {
     formCadastro.addEventListener("submit", async function(event) {
         event.preventDefault();
 
-        const usuario = document.getElementById("novoUsuario").value.trim();
-        const email = document.getElementById("novoEmail").value.trim();
-        const senha = document.getElementById("novaSenha").value;
-        const confirmaSenha = document.getElementById("confirmaSenha").value;
+        const usuario = document.getElementById("nome_usuario").value.trim();
+        const email = document.getElementById("email_usuario").value.trim();
+        const senha = document.getElementById("senha_usuario").value;
+        const confirmaSenha = document.getElementById("confirmar").value;
         const mensagem = document.getElementById("mensagemCadastro");
+
+        if (!usuario || !email || !senha || !confirmaSenha) {
+            mostrarMensagem(mensagem, "Preencha todos os campos antes de continuar.", "#ff5c6c");
+            return;
+        }
 
         if (senha !== confirmaSenha) {
             mostrarMensagem(mensagem, "As senhas nao sao iguais.", "#ff5c6c");
@@ -51,9 +60,9 @@ if (formCadastro) {
         mostrarMensagem(mensagem, "Criando conta...", "#ffffff");
 
         const { data: usuarioExistente, error: erroBusca } = await supabase
-            .from("senha")
-            .select("usuario")
-            .eq("usuario", usuario)
+            .from("Usuario")
+            .select("nome_usuario")
+            .eq("nome_usuario", usuario)
             .maybeSingle();
 
         if (erroBusca) {
@@ -68,11 +77,11 @@ if (formCadastro) {
         }
 
         const { error: erroCadastro } = await supabase
-            .from("senha")
+            .from("Usuario")
             .insert({
-                usuario: usuario,
-                email: email,
-                senha: senha
+                nome_usuario: usuario,
+                email_usuario: email,
+                senha_usuario: senha
             });
 
         if (erroCadastro) {
@@ -80,6 +89,8 @@ if (formCadastro) {
             mostrarMensagem(mensagem, "Erro ao criar conta.", "#ff5c6c");
             return;
         }
+
+        
 
         mostrarMensagem(mensagem, "Cadastro realizado com sucesso!", "#72e6a5");
 
@@ -101,17 +112,22 @@ if (formLogin) {
     formLogin.addEventListener("submit", async function(event) {
         event.preventDefault();
 
-        const usuario = document.getElementById("usuario").value.trim();
-        const senha = document.getElementById("senha").value;
+        const usuario = document.getElementById("loginEmail").value.trim();
+        const senha = document.getElementById("loginSenha").value;
         const mensagem = document.getElementById("mensagemLogin");
+
+        if (!usuario || !senha) {
+            mostrarMensagem(mensagem, "Digite e-mail e senha para entrar.", "#ff5c6c");
+            return;
+        }
 
         mostrarMensagem(mensagem, "Entrando...", "#ffffff");
 
         const { data: usuarioEncontrado, error: erroLogin } = await supabase
-            .from("senha")
-            .select("usuario")
-            .eq("usuario", usuario)
-            .eq("senha", senha)
+            .from("Usuario")
+            .select("nome_usuario, email_usuario, senha_usuario")
+            .eq("email_usuario", usuario)
+            .eq("senha_usuario", senha)
             .maybeSingle();
 
         if (erroLogin) {
@@ -127,10 +143,57 @@ if (formLogin) {
 
         mostrarMensagem(mensagem, "Login realizado com sucesso!", "#72e6a5");
 
-        localStorage.setItem("usuarioLogado", usuarioEncontrado.usuario);
+        localStorage.setItem(USUARIO_LOGADO_KEY, usuarioEncontrado.email_usuario);
+        localStorage.setItem("usuarioLogadoNome", usuarioEncontrado.nome_usuario);
 
         setTimeout(function() {
-            window.location.href = "download.html";
+            window.location.href = "perfil.html";
         }, 1000);
     });
+}
+
+async function carregarPerfilUsuario() {
+    const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
+
+    if (!emailLogado) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    const nomePerfil = document.querySelector(".profile-card h1");
+    const nomeSpan = document.querySelector(".profile-info div:nth-of-type(1) span");
+    const emailSpan = document.querySelector(".profile-info div:nth-of-type(2) span");
+
+    if (!nomePerfil || !nomeSpan || !emailSpan) {
+        return;
+    }
+
+    const { data: usuario, error } = await supabase
+        .from("Usuario")
+        .select("nome_usuario, email_usuario")
+        .eq("email_usuario", emailLogado)
+        .maybeSingle();
+
+    if (error) {
+        console.error(error);
+        nomePerfil.innerText = "USUÁRIO";
+        nomeSpan.innerText = "Não foi possível carregar";
+        emailSpan.innerText = emailLogado;
+        return;
+    }
+
+    if (!usuario) {
+        nomePerfil.innerText = "USUÁRIO";
+        nomeSpan.innerText = "Usuário não encontrado";
+        emailSpan.innerText = emailLogado;
+        return;
+    }
+
+    nomePerfil.innerText = usuario.nome_usuario.toUpperCase();
+    nomeSpan.innerText = usuario.nome_usuario;
+    emailSpan.innerText = usuario.email_usuario;
+}
+
+if (document.querySelector(".profile-card")) {
+    carregarPerfilUsuario();
 }
