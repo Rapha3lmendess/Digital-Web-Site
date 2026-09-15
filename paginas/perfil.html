@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -43,47 +44,39 @@
 
 
         <!-- Links de navegação -->
-
         <nav>
 
-
-            <!-- Volta para a página inicial -->
-
+            <!-- Página inicial -->
             <a href="../index.html">
                 Início
             </a>
 
 
             <!-- Página do jogo -->
-
             <a href="tales.html">
                 Yokai Tales
             </a>
-            
+
 
             <!-- Página de download -->
-
             <a href="download.html">
                 Download
             </a>
 
-            
-            <!-- Página atual: Perfil -->
 
+            <!-- Página atual -->
             <a href="perfil.html" class="active">
                 Perfil
             </a>
 
 
             <!-- Página de cadastro -->
-
             <a href="cadastro.html">
                 Cadastro
             </a>
 
 
             <!-- Página de login -->
-
             <a href="login.html" class="btn-login">
                 Login
             </a>
@@ -105,18 +98,21 @@
 
             <!-- ==================================================
                  FOTO DO PERFIL
-            ================================================== -->
+            =================================================== -->
 
             <div class="profile-avatar">
 
                 <!--
-                    Imagem utilizada como avatar.
+                    Foto atual do usuário.
 
-                    Como o perfil está dentro da pasta "paginas",
-                    usamos ../ para acessar outras pastas.
+                    O JavaScript utiliza o ID
+                    "fotoPerfilUsuario" para alterar
+                    a imagem quando o usuário escolher
+                    uma nova foto.
                 -->
 
                 <img
+                    id="fotoPerfilUsuario"
                     src="https://i.pinimg.com/736x/3c/b4/14/3cb4148f22f10714f1d5ed7e6d807205.jpg"
                     alt="Foto de perfil do jogador"
                 >
@@ -126,13 +122,50 @@
 
 
             <!-- ==================================================
-                 TÍTULO DO PERFIL
-            ================================================== -->
+                 TÍTULO DO PERFIL + ALTERAR FOTO
+            =================================================== -->
 
-            <p class="orange-text">
-                PERFIL DO USUÁRIO
-            </p>
+            <div class="profile-title">
 
+                <!-- Nome da seção -->
+                <p class="orange-text">
+                    PERFIL DO USUÁRIO
+                </p>
+
+
+                <!--
+                    Botão pequeno para alterar a foto.
+
+                    O label abre o seletor de imagens
+                    através do input logo abaixo.
+                -->
+
+                <label for="fotoPerfil" class="btn-alterar-foto">
+                    ALTERAR FOTO
+                </label>
+
+            </div>
+
+
+            <!--
+                Input responsável por selecionar
+                uma nova foto.
+
+                Ele fica escondido.
+            -->
+
+            <input
+                type="file"
+                id="fotoPerfil"
+                accept="image/*"
+                hidden
+            >
+
+
+
+            <!-- ==================================================
+                 NOME DO USUÁRIO
+            =================================================== -->
 
             <h1>
                 JOGADOR
@@ -147,13 +180,12 @@
 
             <!-- ==================================================
                  INFORMAÇÕES DO USUÁRIO
-            ================================================== -->
+            =================================================== -->
 
             <div class="profile-info">
 
 
                 <!-- Nome -->
-
                 <div>
 
                     <strong>
@@ -167,9 +199,7 @@
                 </div>
 
 
-
                 <!-- E-mail -->
-
                 <div>
 
                     <strong>
@@ -183,9 +213,7 @@
                 </div>
 
 
-
                 <!-- Jogo favorito -->
-
                 <div>
 
                     <strong>
@@ -204,27 +232,63 @@
 
 
             <!-- ==================================================
-                 BOTÕES DO PERFIL
+                 AÇÕES DA CONTA
+            =================================================== -->
+
+            <div class="account-buttons">
+
+
+                <!-- Redefinir senha -->
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    onclick="redefinirSenha()"
+                >
+                    REDEFINIR SENHA
+                </button>
+
+
+                <!-- Deletar conta -->
+                <button
+                    type="button"
+                    class="btn-danger"
+                    onclick="deletarConta()"
+                >
+                    DELETAR CONTA
+                </button>
+
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 BOTÕES DE NAVEGAÇÃO
             =================================================== -->
 
             <div class="profile-buttons">
 
 
                 <!-- Ir para a página do jogo -->
-
-                <a href="tales.html" class="btn-primary">
+                <a
+                    href="tales.html"
+                    class="btn-primary"
+                >
                     YOKAI TALES
                 </a>
 
 
                 <!-- Voltar para a página inicial -->
-
-                <a href="../index.html" class="btn-secondary">
+                <a
+                    href="../index.html"
+                    class="btn-secondary"
+                >
                     INÍCIO
                 </a>
 
 
             </div>
+
 
         </section>
 
@@ -238,24 +302,18 @@
 
     <footer>
 
-
         <!-- Nome da empresa -->
-
         <h3>
             DIGITAL <span>GHOST</span>
         </h3>
 
 
         <!-- Informação sobre o projeto -->
-
         <p>
             Projeto acadêmico desenvolvido para fins educacionais.
         </p>
 
-
     </footer>
-
-
 
     <!-- ==================================================
          JAVASCRIPT
@@ -264,8 +322,8 @@
     <!--
         O JavaScript está na pasta "js".
 
-        Como esta página está dentro de "paginas",
-        usamos ../ para voltar à pasta principal.
+        Como o perfil está dentro da pasta "paginas",
+        usamos ../ para voltar para a pasta principal.
     -->
 
     <script type="module" src="../js/script.js"></script>
@@ -274,3 +332,4 @@
 </body>
 
 </html>
+```
