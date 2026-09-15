@@ -7,7 +7,7 @@
          CONFIGURAÇÕES DA PÁGINA
     =================================================== -->
 
-    <!-- Codificação dos caracteres -->
+    <!-- Define a codificação dos caracteres -->
     <meta charset="UTF-8">
 
     <!-- Faz o site funcionar corretamente em celulares -->
@@ -17,7 +17,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="../imagens/favicon.ico">
 
     <!-- Título que aparece na aba do navegador -->
-    <title>Login | Digital Ghost</title>
+    <title>Yokai Tales | Digital Ghost</title>
 
     <!-- Arquivo CSS principal -->
     <link rel="stylesheet" href="../css/style.css">
@@ -54,20 +54,20 @@
             </a>
 
 
-            <!-- Página do jogo -->
+            <!-- Página Yokai Tales -->
 
             <a href="tales.html">
                 Yokai Tales
             </a>
 
 
-            <!-- Página de download -->
+            <!-- Página atual: Download -->
 
-            <a href="download.html">
+            <a href="download.html" class="active">
                 Download
             </a>
 
-            
+
             <!-- Página de perfil -->
 
             <a href="perfil.html">
@@ -82,9 +82,9 @@
             </a>
 
 
-            <!-- Página atual: Login -->
+            <!-- Página de login -->
 
-            <a href="login.html" class="btn-login active">
+            <a href="login.html" class="btn-login">
                 Login
             </a>
 
@@ -95,106 +95,38 @@
 
 
     <!-- ==================================================
-         ÁREA DE LOGIN
+         CONTEÚDO PRINCIPAL
     =================================================== -->
 
-    <main class="form-page">
+    <main>
 
 
-        <!-- Container principal do formulário -->
+        <!-- ==================================================
+             DOWNLOAD DO JOGO
+        =================================================== -->
 
-        <div class="form-container">
+        <section class="game-hero">
 
+            <div>
 
-            <!-- Texto de destaque -->
+                <a href="" class="logo"><h2 class="orange-text-grande">
+                    DOWNLOAD
+                </h2></a>
 
-            <p class="orange-text">
-                BEM-VINDO DE VOLTA
-            </p>
-
-
-            <!-- Título -->
-
-            <h1>
-                FAZER <span>LOGIN</span>
-            </h1>
+                <p>
+                    Somente para usuários cadastrados.
+                </p>
 
 
-            <!-- Pequena descrição -->
+                <!-- Descrição curta -->
+                <!--
+                <p>
+                    Uma aventura inspirada no folclore japonês.
+                </p>
+                -->
+            </div>
 
-            <p>
-                Entre na sua conta da Digital Ghost.
-            </p>
-
-
-
-            <!-- ==================================================
-                 FORMULÁRIO
-            =================================================== -->
-
-            <form id="formLogin">
-
-
-                <!-- Campo de e-mail -->
-
-                <label for="loginEmail">
-                    E-mail
-                </label>
-
-
-                <input
-                    type="email"
-                    id="loginEmail"
-                    placeholder="Digite seu e-mail"
-                >
-
-
-
-                <!-- Campo de senha -->
-
-                <label for="loginSenha">
-                    Senha
-                </label>
-
-
-                <input
-                    type="password"
-                    id="loginSenha"
-                    placeholder="Digite sua senha"
-                >
-
-
-
-                <!-- Botão de login -->
-
-                <button type="submit" class="btn-primary">
-                    ENTRAR
-                </button>
-
-                <p id="mensagemLogin" aria-live="polite"></p>
-
-            </form>
-
-
-
-            <!-- ==================================================
-                 LINK PARA CADASTRO
-            =================================================== -->
-
-            <p class="form-link">
-
-                Ainda não possui uma conta?
-
-                <a href="cadastro.html">
-                    Criar conta
-                </a>
-
-            </p>
-
-        </div>
-
-    </main>
-
+        </section>
 
 
     <!-- ==================================================
@@ -217,6 +149,13 @@
             Projeto acadêmico desenvolvido para fins educacionais.
         </p>
 
+
+        <!-- Copyright -->
+
+        <p class="copyright">
+            © 2026 Digital Ghost Software
+        </p>
+
     </footer>
 
 
@@ -226,7 +165,7 @@
     =================================================== -->
 
     <!--
-        Como este arquivo está dentro da pasta "paginas",
+        Como esta página está dentro da pasta "paginas",
         usamos ../ para voltar à pasta principal.
     -->
 
