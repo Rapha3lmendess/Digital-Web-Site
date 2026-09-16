@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -242,7 +241,7 @@
                 <button
                     type="button"
                     class="btn-secondary"
-                    onclick="redefinirSenha()"
+                    id="abrirModalSenha"
                 >
                     REDEFINIR SENHA
                 </button>
@@ -252,7 +251,7 @@
                 <button
                     type="button"
                     class="btn-danger"
-                    onclick="deletarConta()"
+                    id="abrirModalExclusao"
                 >
                     DELETAR CONTA
                 </button>
@@ -295,6 +294,49 @@
     </main>
 
 
+    <div id="modalSenha" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloModalSenha" hidden>
+        <div class="modal-content">
+            <button type="button" id="fecharModalSenha" class="modal-close" aria-label="Fechar janela">&times;</button>
+
+            <p class="orange-text">SEGURANÇA</p>
+            <h2 id="tituloModalSenha">ALTERAR SENHA</h2>
+            <p>Digite sua nova senha para atualizar sua conta.</p>
+
+            <form id="formAlterarSenha">
+                <label for="novaSenha">Nova senha</label>
+                <input type="password" id="novaSenha" placeholder="Digite sua nova senha" required>
+
+                <label for="confirmarNovaSenha">Confirmar Nova Senha</label>
+                <input type="password" id="confirmarNovaSenha" placeholder="Digite a nova senha novamente" required>
+
+                <button type="submit" class="btn-primary">SALVAR NOVA SENHA</button>
+                <p id="mensagemSenha" aria-live="polite"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalExclusao" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloModalExclusao" hidden>
+        <div class="modal-content">
+            <button type="button" id="fecharModalExclusao" class="modal-close" aria-label="Fechar janela">&times;</button>
+
+            <p class="orange-text">AUTORIZAÇÃO</p>
+            <h2 id="tituloModalExclusao">CONFIRMAR EXCLUSÃO</h2>
+            <p>Informe o login e a senha de um administrador para excluir esta conta.</p>
+
+            <form id="formExclusaoConta">
+                <label for="loginAdministrador">Login do administrador</label>
+                <input type="text" id="loginAdministrador" placeholder="Digite o login do administrador" required>
+
+                <label for="senhaAdministrador">Senha do administrador</label>
+                <input type="password" id="senhaAdministrador" placeholder="Digite a senha do administrador" required>
+
+                <button type="submit" class="btn-danger">CONFIRMAR EXCLUSÃO</button>
+                <p id="mensagemExclusao" aria-live="polite"></p>
+            </form>
+        </div>
+    </div>
+
+
 
     <!-- ==================================================
          RODAPÉ
@@ -332,4 +374,3 @@
 </body>
 
 </html>
-```

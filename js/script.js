@@ -20,7 +20,7 @@ import {
 } from "./supabase-config.js";
 
 const USUARIO_LOGADO_KEY = "usuarioLogadoEmail";
-const LINK_DOWNLOAD = "https://www.google.com/";
+const LINK_DOWNLOAD = "https://imgs.search.brave.com/P8kr9IV17POo-OX4dYjQyc9_bpKRWvaM4UWrlIGrvVI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/aWNlZ2lmLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMy8w/MS9pY2VnaWYtMTY1/LmdpZg.gif";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
@@ -157,9 +157,25 @@ const downloadButton = document.getElementById("downloadButton");
 const downloadModal = document.getElementById("downloadModal");
 const closeDownloadModal = document.getElementById("closeDownloadModal");
 const formDownloadLogin = document.getElementById("formDownloadLogin");
+const abrirModalSenha = document.getElementById("abrirModalSenha");
+const modalSenha = document.getElementById("modalSenha");
+const fecharModalSenha = document.getElementById("fecharModalSenha");
+const formAlterarSenha = document.getElementById("formAlterarSenha");
+const abrirModalExclusao = document.getElementById("abrirModalExclusao");
+const modalExclusao = document.getElementById("modalExclusao");
+const fecharModalExclusao = document.getElementById("fecharModalExclusao");
+const formExclusaoConta = document.getElementById("formExclusaoConta");
 
 function abrirLinkDownload() {
     window.location.href = LINK_DOWNLOAD;
+}
+
+async function buscarUsuarioPorEmail(email) {
+    return supabase
+        .from("Usuario")
+        .select("nome_usuario, email_usuario")
+        .eq("email_usuario", email)
+        .maybeSingle();
 }
 
 function fecharModalDownload() {
@@ -169,8 +185,29 @@ function fecharModalDownload() {
 }
 
 if (downloadButton) {
-    downloadButton.addEventListener("click", function() {
-        if (localStorage.getItem(USUARIO_LOGADO_KEY)) {
+    downloadButton.addEventListener("click", async function() {
+        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
+        const mensagem = document.getElementById("mensagemDownload");
+
+        if (emailLogado) {
+            const { data: usuarioEncontrado, error: erroBusca } = await buscarUsuarioPorEmail(emailLogado);
+
+            if (erroBusca) {
+                console.error(erroBusca);
+                downloadModal.hidden = false;
+                mostrarMensagem(mensagem, "Erro ao verificar usuario.", "#ff5c6c");
+                return;
+            }
+
+            if (!usuarioEncontrado) {
+                localStorage.removeItem(USUARIO_LOGADO_KEY);
+                localStorage.removeItem("usuarioLogadoNome");
+                downloadModal.hidden = false;
+                mostrarMensagem(mensagem, "O usuario não existe", "#ff5c6c");
+                document.getElementById("downloadLoginEmail").focus();
+                return;
+            }
+
             abrirLinkDownload();
             return;
         }
@@ -216,13 +253,212 @@ if (formDownloadLogin) {
         }
 
         if (!usuarioEncontrado) {
-            mostrarMensagem(mensagem, "Usuario ou senha incorretos.", "#ff5c6c");
+            mostrarMensagem(mensagem, "O usuario não existe", "#ff5c6c");
             return;
         }
 
         localStorage.setItem(USUARIO_LOGADO_KEY, usuarioEncontrado.email_usuario);
         localStorage.setItem("usuarioLogadoNome", usuarioEncontrado.nome_usuario);
         abrirLinkDownload();
+    });
+}
+
+function fecharModalAlterarSenha() {
+    if (modalSenha) {
+        modalSenha.hidden = true;
+    }
+}
+
+if (abrirModalSenha) {
+    abrirModalSenha.addEventListener("click", function() {
+        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
+
+        if (!emailLogado) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        modalSenha.hidden = false;
+        document.getElementById("novaSenha").focus();
+    });
+}
+
+if (fecharModalSenha) {
+    fecharModalSenha.addEventListener("click", fecharModalAlterarSenha);
+}
+
+if (modalSenha) {
+    modalSenha.addEventListener("click", function(event) {
+        if (event.target === modalSenha) {
+            fecharModalAlterarSenha();
+        }
+    });
+}
+
+if (formAlterarSenha) {
+    formAlterarSenha.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
+        const novaSenha = document.getElementById("novaSenha").value;
+        const confirmarNovaSenha = document.getElementById("confirmarNovaSenha").value;
+        const mensagem = document.getElementById("mensagemSenha");
+
+        if (!emailLogado) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (!novaSenha || !confirmarNovaSenha) {
+            mostrarMensagem(mensagem, "Preencha os dois campos de senha.", "#ff5c6c");
+            return;
+        }
+
+        if (novaSenha !== confirmarNovaSenha) {
+            mostrarMensagem(mensagem, "As senhas nao sao iguais.", "#ff5c6c");
+            return;
+        }
+
+        mostrarMensagem(mensagem, "Atualizando senha...", "#ffffff");
+
+        const { data: usuarioExistente, error: erroBuscaUsuario } = await buscarUsuarioPorEmail(emailLogado);
+
+        if (erroBuscaUsuario) {
+            console.error(erroBuscaUsuario);
+            mostrarMensagem(mensagem, "Erro ao verificar usuario.", "#ff5c6c");
+            return;
+        }
+
+        if (!usuarioExistente) {
+            mostrarMensagem(mensagem, "Usuario nao encontrado.", "#ff5c6c");
+            return;
+        }
+
+        const { error: erroAtualizacao } = await supabase
+            .from("Usuario")
+            .update({ senha_usuario: novaSenha })
+            .eq("email_usuario", emailLogado);
+
+        if (erroAtualizacao) {
+            console.error(erroAtualizacao);
+            mostrarMensagem(mensagem, "Erro ao atualizar senha.", "#ff5c6c");
+            return;
+        }
+
+        mostrarMensagem(mensagem, "Senha atualizada com sucesso!", "#72e6a5");
+        formAlterarSenha.reset();
+
+        setTimeout(function() {
+            fecharModalAlterarSenha();
+        }, 1000);
+    });
+}
+
+function fecharModalDeExclusao() {
+    if (modalExclusao) {
+        modalExclusao.hidden = true;
+    }
+}
+
+if (abrirModalExclusao) {
+    abrirModalExclusao.addEventListener("click", function() {
+        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
+
+        if (!emailLogado) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        modalExclusao.hidden = false;
+        document.getElementById("loginAdministrador").focus();
+    });
+}
+
+if (fecharModalExclusao) {
+    fecharModalExclusao.addEventListener("click", fecharModalDeExclusao);
+}
+
+if (modalExclusao) {
+    modalExclusao.addEventListener("click", function(event) {
+        if (event.target === modalExclusao) {
+            fecharModalDeExclusao();
+        }
+    });
+}
+
+if (formExclusaoConta) {
+    formExclusaoConta.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const emailUsuario = localStorage.getItem(USUARIO_LOGADO_KEY);
+        const loginAdministrador = document.getElementById("loginAdministrador").value.trim();
+        const senhaAdministrador = document.getElementById("senhaAdministrador").value;
+        const mensagem = document.getElementById("mensagemExclusao");
+
+        if (!emailUsuario) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (!loginAdministrador || !senhaAdministrador) {
+            mostrarMensagem(mensagem, "Preencha o login e a senha do administrador.", "#ff5c6c");
+            return;
+        }
+
+        mostrarMensagem(mensagem, "Validando administrador...", "#ffffff");
+
+        const { data: administrador, error: erroAdministrador } = await supabase
+            .from("Administrador")
+            .select("login_administrador")
+            .eq("login_administrador", loginAdministrador)
+            .eq("senha_administrador", senhaAdministrador)
+            .limit(1)
+            .maybeSingle();
+
+        if (erroAdministrador) {
+            console.error(erroAdministrador);
+            mostrarMensagem(mensagem, "Erro ao validar administrador.", "#ff5c6c");
+            return;
+        }
+
+        if (!administrador || administrador.login_administrador !== loginAdministrador) {
+            mostrarMensagem(mensagem, "Login ou senha de administrador invalidos.", "#ff5c6c");
+            return;
+        }
+
+        mostrarMensagem(mensagem, "Excluindo conta...", "#ffffff");
+
+        const { data: usuarioExistente, error: erroBuscaUsuario } = await buscarUsuarioPorEmail(emailUsuario);
+
+        if (erroBuscaUsuario) {
+            console.error(erroBuscaUsuario);
+            mostrarMensagem(mensagem, "Erro ao verificar usuario.", "#ff5c6c");
+            return;
+        }
+
+        if (!usuarioExistente) {
+            mostrarMensagem(mensagem, "Usuario nao encontrado.", "#ff5c6c");
+            return;
+        }
+
+        const { error: erroExclusao } = await supabase
+            .from("Usuario")
+            .delete()
+            .eq("email_usuario", emailUsuario);
+
+        if (erroExclusao) {
+            console.error(erroExclusao);
+            mostrarMensagem(mensagem, "Erro ao excluir conta.", "#ff5c6c");
+            return;
+        }
+
+        localStorage.removeItem(USUARIO_LOGADO_KEY);
+        localStorage.removeItem("usuarioLogadoNome");
+        mostrarMensagem(mensagem, "Conta excluida com sucesso.", "#72e6a5");
+
+        setTimeout(function() {
+            window.location.href = "../index.html";
+        }, 1000);
     });
 }
 
