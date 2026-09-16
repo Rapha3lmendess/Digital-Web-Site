@@ -109,9 +109,11 @@
 
             <div>
 
-                <a href="" class="logo"><h2 class="orange-text-grande">
+                <button type="button" id="downloadButton" class="btn-primary">
+                    <h2 class="orange-text-grande">
                     DOWNLOAD
-                </h2></a>
+                    </h2>
+                </button>
 
                 <p>
                     Somente para usuários cadastrados.
@@ -127,6 +129,27 @@
             </div>
 
         </section>
+
+        <div id="downloadModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="downloadModalTitle" hidden>
+            <div class="modal-content">
+                <button type="button" id="closeDownloadModal" class="modal-close" aria-label="Fechar janela">&times;</button>
+
+                <p class="orange-text">DOWNLOAD</p>
+                <h2 id="downloadModalTitle">CONFIRME SEU LOGIN</h2>
+                <p>Entre na sua conta para continuar o download.</p>
+
+                <form id="formDownloadLogin">
+                    <label for="downloadLoginEmail">E-mail</label>
+                    <input type="email" id="downloadLoginEmail" placeholder="Digite seu e-mail" required>
+
+                    <label for="downloadLoginSenha">Senha</label>
+                    <input type="password" id="downloadLoginSenha" placeholder="Digite sua senha" required>
+
+                    <button type="submit" class="btn-primary">CONFIRMAR E BAIXAR</button>
+                    <p id="mensagemDownload" aria-live="polite"></p>
+                </form>
+            </div>
+        </div>
 
 
     <!-- ==================================================
