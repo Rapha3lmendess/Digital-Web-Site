@@ -1704,3 +1704,97 @@ footer p {
     }
 
 }
+
+
+/* =========================================================
+   JANELA DE LOGIN DO DOWNLOAD
+========================================================= */
+
+.modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background-color: rgba(0, 0, 0, 0.82);
+}
+
+
+.modal[hidden] {
+
+    display: none;
+}
+
+
+.modal-content {
+
+    position: relative;
+
+    width: 100%;
+
+    max-width: 500px;
+
+    padding: 45px;
+
+    background-color: #111111;
+
+    border: 1px solid #292929;
+
+    border-radius: 10px;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+
+.modal-content h2 {
+
+    margin-bottom: 12px;
+
+    font-size: 30px;
+}
+
+
+.modal-content > p:not(.orange-text) {
+
+    color: #888888;
+
+    margin-bottom: 25px;
+}
+
+
+.modal-close {
+
+    position: absolute;
+
+    top: 12px;
+
+    right: 16px;
+
+    border: 0;
+
+    background: transparent;
+
+    color: #999999;
+
+    font-size: 30px;
+
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+
+.modal-close:hover {
+
+    color: #ff6600;
+}

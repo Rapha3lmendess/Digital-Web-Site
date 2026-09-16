@@ -20,6 +20,7 @@ import {
 } from "./supabase-config.js";
 
 const USUARIO_LOGADO_KEY = "usuarioLogadoEmail";
+const LINK_DOWNLOAD = "https://www.google.com/";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
@@ -149,6 +150,79 @@ if (formLogin) {
         setTimeout(function() {
             window.location.href = "perfil.html";
         }, 1000);
+    });
+}
+
+const downloadButton = document.getElementById("downloadButton");
+const downloadModal = document.getElementById("downloadModal");
+const closeDownloadModal = document.getElementById("closeDownloadModal");
+const formDownloadLogin = document.getElementById("formDownloadLogin");
+
+function abrirLinkDownload() {
+    window.location.href = LINK_DOWNLOAD;
+}
+
+function fecharModalDownload() {
+    if (downloadModal) {
+        downloadModal.hidden = true;
+    }
+}
+
+if (downloadButton) {
+    downloadButton.addEventListener("click", function() {
+        if (localStorage.getItem(USUARIO_LOGADO_KEY)) {
+            abrirLinkDownload();
+            return;
+        }
+
+        downloadModal.hidden = false;
+        document.getElementById("downloadLoginEmail").focus();
+    });
+}
+
+if (closeDownloadModal) {
+    closeDownloadModal.addEventListener("click", fecharModalDownload);
+}
+
+if (downloadModal) {
+    downloadModal.addEventListener("click", function(event) {
+        if (event.target === downloadModal) {
+            fecharModalDownload();
+        }
+    });
+}
+
+if (formDownloadLogin) {
+    formDownloadLogin.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("downloadLoginEmail").value.trim();
+        const senha = document.getElementById("downloadLoginSenha").value;
+        const mensagem = document.getElementById("mensagemDownload");
+
+        mostrarMensagem(mensagem, "Confirmando login...", "#ffffff");
+
+        const { data: usuarioEncontrado, error: erroLogin } = await supabase
+            .from("Usuario")
+            .select("nome_usuario, email_usuario, senha_usuario")
+            .eq("email_usuario", email)
+            .eq("senha_usuario", senha)
+            .maybeSingle();
+
+        if (erroLogin) {
+            console.error(erroLogin);
+            mostrarMensagem(mensagem, "Erro ao fazer login.", "#ff5c6c");
+            return;
+        }
+
+        if (!usuarioEncontrado) {
+            mostrarMensagem(mensagem, "Usuario ou senha incorretos.", "#ff5c6c");
+            return;
+        }
+
+        localStorage.setItem(USUARIO_LOGADO_KEY, usuarioEncontrado.email_usuario);
+        localStorage.setItem("usuarioLogadoNome", usuarioEncontrado.nome_usuario);
+        abrirLinkDownload();
     });
 }
 
