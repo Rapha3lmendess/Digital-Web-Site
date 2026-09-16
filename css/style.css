@@ -269,6 +269,28 @@ img {
     transition: 0.3s;
 }
 
+.btn-download {
+
+    display: inline-block;
+
+    background-color: #ff6600;
+
+    color: #ffffff;
+
+    padding: 14px 24px;
+
+    border-radius: 5px;
+
+    font-weight: bold;
+
+    font-size: 40px;
+
+    border: 1px solid #ff6600;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
 
 /* Hover */
 
@@ -283,6 +305,16 @@ img {
     box-shadow: 0 10px 30px rgba(255, 102, 0, 0.20);
 }
 
+.btn-download:hover {
+
+    background-color: transparent;
+
+    color: #ff6600;
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 10px 30px rgba(255, 102, 0, 0.20);
+}
 
 /* =========================================================
    BOTÃO SECUNDÁRIO
