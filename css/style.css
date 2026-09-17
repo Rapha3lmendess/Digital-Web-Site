@@ -827,7 +827,7 @@ img {
 
 
 /* =========================================================
-   CARD Do FOXY
+   CARD Do FOX
 ========================================================= */
 
 .character-card {
@@ -861,36 +861,24 @@ img {
 /* Área da imagem da Foxy */
 .character-image {
     width: 100%;
-    height: 260px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background-color: #080808;
+    overflow: hidden;
 
     margin-bottom: 25px;
+    border-radius: 40px;
+    /*transform: scale(1.2);*/
 
-    border-radius: 5px;
-
-    overflow: hidden;
+.character-image img {
+    display: block;
+    width: 100%;
+    height: auto;
 }
-
-/* Imagem da Foxy */
-.character-image {
-    width: 90%;
-    height: 500px;
-
     overflow: hidden;
-    background-color: #080808;
-    border-radius: 55px;
-    margin-bottom: 25px;
 }
 
 /* Efeito ao passar o mouse */
-.character-image img:hover {
+/*.character-image img:hover {
     transform: scale(1.05);
-}
+}*/
 
 /* Nome */
 
