@@ -196,17 +196,21 @@ nameForm?.addEventListener("submit", async (event) => {
     setBusy(nameForm, true, "Salvando…");
     let result;
     try {
-        result = await apiRequest("/api/profile", { method: "PATCH", body: { full_name: name } });
+        result = await supabase.auth.updateUser({ data: { full_name: name } });
     } catch (error) {
         setBusy(nameForm, false);
         showMessage(message, error.message, "error");
         return;
     }
     setBusy(nameForm, false);
+    if (result.error) {
+        showMessage(message, "Não foi possível atualizar o nome.", "error");
+        return;
+    }
     const heading = $(".profile-card h1");
     const spans = $(".profile-info")?.querySelectorAll("div span");
     if (heading) heading.textContent = name.toLocaleUpperCase("pt-BR");
-    if (spans?.[0]) spans[0].textContent = result.full_name || name;
+    if (spans?.[0]) spans[0].textContent = result.data.user.user_metadata?.full_name || name;
     showMessage(message, "Nome atualizado.", "success");
 });
 
@@ -253,7 +257,13 @@ deleteForm?.addEventListener("submit", async (event) => {
     setBusy(deleteForm, false);
     if (deleteError) {
         console.error("Falha na exclusão da conta.", deleteError);
-        showMessage(message, "Não foi possível excluir. Confira se a API Node.js está publicada e configurada.", "error");
+        showMessage(
+            message,
+            deleteError.message.includes("not configured")
+                ? "A exclusão de conta ainda não foi habilitada pelo responsável do Supabase."
+                : "Não foi possível excluir. Confira se a API Node.js está publicada e configurada.",
+            "error"
+        );
         return;
     }
     await supabase.auth.signOut();

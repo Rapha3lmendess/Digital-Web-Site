@@ -22,7 +22,7 @@ Este plano cruza o feedback semanal do professor, as documentações anteriormen
 ## Ajustes técnicos locais
 
 - Auth migrou para Supabase Auth; o cliente não compara nem persiste senhas em `localStorage`/tabela própria.
-- Perfil lê/atualiza nome e senha pela sessão; API Node.js valida token e limita a exclusão à identidade autenticada.
+- Perfil lê os dados pela API e atualiza nome/senha pela sessão Supabase; API Node.js valida token e limita a exclusão à identidade autenticada. A exclusão exige a chave administrativa apenas no servidor.
 - Compra simulada grava edição; trigger define usuário, valor, estado e horário.
 - Políticas RLS separam pedidos por `auth.uid()`; cliente tem apenas leitura/criação, sem edição/exclusão de recibo.
 - Migração desabilita acesso dos papéis web às antigas tabelas `Usuario`, `Cartao` e `Administrador` quando existirem, habilitando RLS sem políticas. Seguindo a orientação da equipe, **as linhas são preservadas e permanecem bloqueadas para acesso web**; nenhuma exclusão de dados foi feita.

@@ -23,7 +23,7 @@ O cadastro identifica usuários que desejam manter uma conta e acompanhar seus p
 |---|---|---|
 | Visitante | Informa nome, e-mail e senha e confirma a senha. | Solicita Create para a própria conta. |
 | Aplicação web | Valida campos básicos, envia credenciais/metadados e permite ao usuário atualizar nome/senha e solicitar exclusão. | Solicita Create/Read/Update/Delete da própria conta via Auth/Node API; não grava senha em tabela própria. |
-| Supabase Auth e API Node.js | Auth cria identidade e gerencia credenciais; API valida sessão e exclui apenas a identidade autenticada. | Create/Read/Update/Delete da própria conta; chave administrativa fica no servidor. |
+| Supabase Auth e API Node.js | Auth cria identidade, gerencia credenciais e atualiza nome; API valida sessão e exclui apenas a identidade autenticada. | Create/Read/Update de dados próprios; Delete próprio exige chave administrativa exclusivamente no servidor. |
 
 ## 3. Caso de uso e RNF (15%)
 
@@ -60,7 +60,7 @@ O cadastro identifica usuários que desejam manter uma conta e acompanhar seus p
 ## 4. Protótipo funcional (50%)
 
 - Tela: `paginas/cadastro.html`.
-- Código cliente: `js/script.js`; API Node.js: `server/index.js` (exclusão de conta autenticada).
+- Código cliente: `js/script.js`; API Node.js: `server/index.js` (leitura de perfil e exclusão autenticada; exclusão requer chave administrativa no servidor).
 - Perfil permite consultar e atualizar nome e senha da própria identidade pelo Supabase Auth.
 - Exclusão da identidade pede confirmação explícita e senha atual; `server/index.js` valida o token e apaga somente a identidade autenticada. A API precisa ser publicada e configurada com `SUPABASE_SERVICE_ROLE_KEY` como segredo exclusivamente server-side.
 - Estados: vazio, preenchimento, campos inválidos, criação/processamento e sucesso/confirmação pendente.

@@ -19,16 +19,16 @@ const allowedOrigins = new Set(
         .filter(Boolean)
 );
 
-if (!projectUrl || !publicKey || !serviceRoleKey) {
-    throw new Error("Configure SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY (or SUPABASE_ANON_KEY) and SUPABASE_SERVICE_ROLE_KEY in the server environment.");
+if (!projectUrl || !publicKey) {
+    throw new Error("Configure SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY (or SUPABASE_ANON_KEY) in the server environment.");
 }
 
 const authClient = createClient(projectUrl, publicKey, {
     auth: { persistSession: false, autoRefreshToken: false }
 });
-const adminClient = createClient(projectUrl, serviceRoleKey, {
+const adminClient = serviceRoleKey ? createClient(projectUrl, serviceRoleKey, {
     auth: { persistSession: false, autoRefreshToken: false }
-});
+}) : null;
 
 function sendJson(response, status, body, corsOrigin) {
     const headers = {
@@ -75,9 +75,12 @@ async function authenticate(request) {
     return { user, client: createUserClient(token) };
 }
 
-const server = createServer(async (request, response) => {
+export async function handler(request, response) {
     const origin = request.headers.origin;
-    if (origin && !allowedOrigins.has(origin)) {
+    const forwardedHost = request.headers["x-forwarded-host"] || request.headers.host;
+    const forwardedProto = request.headers["x-forwarded-proto"]?.split(",")[0] || "https";
+    const isSameOrigin = origin && forwardedHost && origin === `${forwardedProto}://${forwardedHost}`;
+    if (origin && !allowedOrigins.has(origin) && !isSameOrigin) {
         sendJson(response, 403, { error: "Origin not allowed" });
         return;
     }
@@ -104,28 +107,14 @@ const server = createServer(async (request, response) => {
     }
 
     try {
-        if (path === "/api/profile" && ["GET", "PATCH"].includes(request.method)) {
+        if (path === "/api/profile" && request.method === "GET") {
             const auth = await authenticate(request);
             if (auth.error) return sendJson(response, auth.status, { error: auth.error }, origin);
-
-            if (request.method === "GET") {
-                return sendJson(response, 200, {
-                    id: auth.user.id,
-                    email: auth.user.email,
-                    full_name: auth.user.user_metadata?.full_name || "Usuário"
-                }, origin);
-            }
-
-            const payload = await readJson(request);
-            const name = typeof payload.full_name === "string" ? payload.full_name.trim() : "";
-            if (name.length < 2 || name.length > 80) {
-                return sendJson(response, 400, { error: "Name must contain between 2 and 80 characters" }, origin);
-            }
-            const { data, error } = await adminClient.auth.admin.updateUserById(auth.user.id, {
-                user_metadata: { ...auth.user.user_metadata, full_name: name }
-            });
-            if (error) return sendJson(response, 400, { error: "Profile update failed" }, origin);
-            return sendJson(response, 200, { full_name: data.user.user_metadata?.full_name || name }, origin);
+            return sendJson(response, 200, {
+                id: auth.user.id,
+                email: auth.user.email,
+                full_name: auth.user.user_metadata?.full_name || "Usuário"
+            }, origin);
         }
 
         if (path === "/api/payments" && ["GET", "POST"].includes(request.method)) {
@@ -184,6 +173,9 @@ const server = createServer(async (request, response) => {
         if (path === "/api/account/delete" && request.method === "POST") {
             const auth = await authenticate(request);
             if (auth.error) return sendJson(response, auth.status, { error: auth.error }, origin);
+            if (!adminClient) {
+                return sendJson(response, 503, { error: "Account deletion is not configured on the server" }, origin);
+            }
             const { error } = await adminClient.auth.admin.deleteUser(auth.user.id);
             if (error) {
                 console.error("Account deletion failed", error);
@@ -198,8 +190,10 @@ const server = createServer(async (request, response) => {
         if (status === 500) console.error("API request failed", error);
         sendJson(response, status, { error: status === 500 ? "Request failed" : error.message }, origin);
     }
-});
+}
 
-server.listen(port, "0.0.0.0", () => {
-    console.log(`Yokai Tales API listening on port ${port}`);
-});
+if (!process.env.VERCEL) {
+    createServer(handler).listen(port, "0.0.0.0", () => {
+        console.log(`Yokai Tales API listening on port ${port}`);
+    });
+}

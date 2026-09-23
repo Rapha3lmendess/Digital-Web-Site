@@ -62,7 +62,7 @@ A autenticação identifica o usuário antes de apresentar dados pessoais, hist�
 - Implementação: `js/script.js` e `js/supabase-config.js`.
 - Estados codificados: inicial, incompleto, processando, erro e sucesso/redirecionamento.
 - Persistência de sessão: SDK Supabase Auth.
-- Há URL pública do site em GitHub Pages: <https://rapha3lmendess.github.io/Digital-Web-Site/>. A API Node.js ainda não tem URL informada; assim, login via Supabase e demais fluxos dependem da validação de configuração Auth e da integração da API no deploy. Não foi fornecida conta de demonstração/teste.
+- Há URL pública do site em GitHub Pages: <https://rapha3lmendess.github.io/Digital-Web-Site/>. O login usa diretamente o Supabase Auth; perfil e operações de compra/download dependem também da API Node.js publicada e configurada. Não foi fornecida conta de demonstração/teste.
 
 ## 5. Arquitetura e ADR (15%)
 
