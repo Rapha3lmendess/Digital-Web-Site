@@ -62,7 +62,7 @@ A autenticação identifica o usuário antes de apresentar dados pessoais, hist�
 - Implementação: `js/script.js` e `js/supabase-config.js`.
 - Estados codificados: inicial, incompleto, processando, erro e sucesso/redirecionamento.
 - Persistência de sessão: SDK Supabase Auth.
-- Há URL pública do site em GitHub Pages: <https://rapha3lmendess.github.io/Digital-Web-Site/>. O login usa diretamente o Supabase Auth; perfil e operações de compra/download dependem também da API Node.js publicada e configurada. Não foi fornecida conta de demonstração/teste.
+- Esta branch prepara o deploy integrado na Vercel; a URL final ainda não foi atribuída. O login usa diretamente o Supabase Auth; perfil e operações de compra/download dependem da API Node.js publicada. Não foi fornecida conta de demonstração/teste.
 
 ## 5. Arquitetura e ADR (15%)
 
@@ -115,8 +115,7 @@ Não há screenshots/logs de testes anexados nesta versão.
 - [x] Há estados de processamento e mensagens de falha/sucesso.
 - [ ] Validar cadastro/login/logout no projeto Supabase real.
 - [ ] Demonstrar a 320 px/1024 px e anexar evidência.
-- [x] Registrar URL pública do site: <https://rapha3lmendess.github.io/Digital-Web-Site/>.
-- [ ] Publicar/configurar a API Node.js e disponibilizar conta de teste apropriada.
+- [ ] Publicar site e API integrados na Vercel e disponibilizar conta de teste apropriada.
 - [ ] Executar e documentar testes de segurança.
 
 **Fontes:** documentos do professor fornecidos, requisitos v15 e arquivos do projeto. A documentação descreve o estado local do código; não atesta comportamento no Supabase remoto.

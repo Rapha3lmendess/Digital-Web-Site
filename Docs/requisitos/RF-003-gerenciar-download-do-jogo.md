@@ -7,7 +7,7 @@
 | ID / título | RF-003 — Gerenciar download do jogo |
 | Tipo / prioridade | Funcional / Alta |
 | Complexidade | Média, estimativa inicial de 5 story points (confirmar com a equipe). |
-| Status | Página de compra e histórico preparados; site publicado no GitHub Pages; API e artefato/URL de release ainda não foram informados. |
+| Status | Página de compra e histórico preparados; esta branch configura site/API integrados na Vercel; URL final e artefato/release ainda não foram informados. |
 | Atualização | 23/09/2026 |
 
 **Projeto/equipe:** Digital Ghost Software — Yokai Tales; integrantes conforme a relação do documento RF-004. Repositório informado: [AndreBlackDragon/YokaiTales-Webpage](https://github.com/AndreBlackDragon/YokaiTales-Webpage), branch `main`. Supabase: projeto `thmtriwgvsgxdinsuxph`. Deploy e release do jogo não informados.
@@ -114,8 +114,7 @@ Não há arquivo, checksum ou evidência de teste de release ainda.
 - [x] Estado de arquivo ausente apresentado sem apontar para mídia aleatória.
 - [x] Requisito de histórico previsto via pedidos Supabase.
 - [ ] Publicar arquivo Standard e Plus ou explicar empacotamento dos conteúdos.
-- [x] Registrar URL do site: <https://rapha3lmendess.github.io/Digital-Web-Site/>.
-- [ ] Publicar/configurar URL da API e definir release permanente e política de versão.
+- [ ] Publicar e validar a aplicação integrada na Vercel; definir release permanente e política de versão.
 - [ ] Executar teste da migração/RLS e registrar evidências.
 - [ ] Fazer demonstração pública com usuário de teste.
 

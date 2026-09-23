@@ -65,7 +65,7 @@ O cadastro identifica usuários que desejam manter uma conta e acompanhar seus p
 - Exclusão da identidade pede confirmação explícita e senha atual; `server/index.js` valida o token e apaga somente a identidade autenticada. A API precisa ser publicada e configurada com `SUPABASE_SERVICE_ROLE_KEY` como segredo exclusivamente server-side.
 - Estados: vazio, preenchimento, campos inválidos, criação/processamento e sucesso/confirmação pendente.
 - O cadastro usa Supabase Auth e armazena o nome em `user_metadata.full_name`.
-- O site está publicado em <https://rapha3lmendess.github.io/Digital-Web-Site/>. A integração remota ainda depende da URL/deploy da API Node.js, configuração Supabase e screenshots de demonstração.
+- Esta branch prepara site e API integrados na Vercel; a URL final ainda não foi atribuída. A integração depende das variáveis Supabase, aplicação da migração SQL e screenshots de demonstração.
 
 ## 5. Arquitetura e ADR (15%)
 
@@ -129,7 +129,6 @@ Screenshots e resultados de testes não foram anexados.
 - [ ] Testar integração com o projeto Supabase da equipe.
 - [ ] Revisar migração de contas legadas que estavam na tabela `Usuario`; senhas antigas não são migradas automaticamente.
 - [ ] Anexar evidência visual e testes de segurança.
-- [x] URL pública do site informada: <https://rapha3lmendess.github.io/Digital-Web-Site/>.
-- [ ] Informar URL da API Node.js e conta de demonstração segura.
+- [ ] Publicar site e API Node.js integrados na Vercel e disponibilizar conta de demonstração segura.
 
 **Fontes:** feedback do professor, RF-002 anteriormente enviado, requisitos v15 e código do projeto. As contas legadas permanecem sem migração automática para Auth.

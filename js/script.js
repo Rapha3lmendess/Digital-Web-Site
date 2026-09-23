@@ -100,7 +100,10 @@ signupForm?.addEventListener("submit", async (event) => {
     const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: name } }
+        options: {
+            data: { full_name: name },
+            emailRedirectTo: new URL("login.html", window.location.href).href
+        }
     });
     setBusy(signupForm, false);
 

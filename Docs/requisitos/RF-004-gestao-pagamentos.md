@@ -11,7 +11,7 @@
 | Tipo | Requisito funcional |
 | Prioridade | Alta — o feedback do professor identifica Gestão de Pagamentos como o próximo requisito. |
 | Complexidade | Média, estimativa inicial de 5 story points; confirmar com a equipe. |
-| Status | Em refinamento; código da simulação preparado e site publicado em <https://rapha3lmendess.github.io/Digital-Web-Site/>. A migração Supabase, publicação/configuração da API Node.js e validação de ponta a ponta ainda precisam ser concluídas. |
+| Status | Em refinamento; código da simulação e configuração Vercel preparados. A migração Supabase, publicação Vercel e validação de ponta a ponta ainda precisam ser concluídas. |
 | Criação / atualização | 23/09/2026 |
 | Projeto | Digital Ghost Software — Yokai Tales |
 
@@ -219,7 +219,7 @@ Os controles estão descritos em código/migração, mas a validação em ambien
 | T1 — Identificação (2%) | Preenchido; estimativa de complexidade deve ser validada pela equipe. |
 | T2 — Descrição e atores (6%) | Objetivo, três atores e CRUD definidos. |
 | T3 — Casos de uso/RNF (15%) | Pré/pós-condições, 12 passos, quatro alternativos, sete regras e quatro RNF. |
-| T4 — Protótipo (50%) | HTML/JS/SQL incluídos; SQL ainda precisa ser executado; site tem URL pública, mas API Node.js e arquivo do jogo ainda não foram confirmados; integração não validada ao vivo. |
+| T4 — Protótipo (50%) | HTML/JS/SQL e configuração Vercel incluídos; SQL ainda precisa ser executado; deploy, integração e arquivo do jogo ainda não foram confirmados. |
 | T5 — Arquitetura/ADR (15%) | Diagrama, fluxo e quatro ADRs descritos. |
 | T6 — OWASP (12%) | Quatro controles e planos de teste descritos; falta executar e anexar evidência. |
 
@@ -232,8 +232,7 @@ Os controles estão descritos em código/migração, mas a validação em ambien
 - [ ] Standard sempre persiste R$ 20,00 e Plus R$ 40,00, mesmo se a requisição adulterar valor.
 - [ ] Nenhum formulário/tabela solicita ou guarda dados de cartão.
 - [ ] Os estados de interface são demonstrados em tela pequena e desktop.
-- [x] URL pública do site informada: <https://rapha3lmendess.github.io/Digital-Web-Site/>.
-- [ ] Validar o site publicado com a API Node.js configurada e acessível.
+- [ ] Publicar e validar site/API integrados na Vercel.
 - [ ] Release do jogo é publicada e `GAME_DOWNLOAD_URL` recebe o endereço real antes de prometer download.
 - [ ] Evidências dos testes de segurança e da demonstração são anexadas.
 

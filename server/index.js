@@ -1,5 +1,5 @@
-import { createServer } from "node:http";
 import { createClient } from "@supabase/supabase-js";
+import { SUPABASE_URL as defaultProjectUrl, SUPABASE_PUBLISHABLE_KEY as defaultPublicKey } from "../js/supabase-config.js";
 
 try {
     process.loadEnvFile();
@@ -7,9 +7,8 @@ try {
     if (error.code !== "ENOENT") throw error;
 }
 
-const port = Number(process.env.PORT || 3000);
-const projectUrl = process.env.SUPABASE_URL;
-const publicKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY;
+const projectUrl = process.env.SUPABASE_URL || defaultProjectUrl;
+const publicKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || defaultPublicKey;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const releaseVersion = process.env.GAME_RELEASE_VERSION || "1.0";
 const allowedOrigins = new Set(
@@ -190,10 +189,4 @@ export async function handler(request, response) {
         if (status === 500) console.error("API request failed", error);
         sendJson(response, status, { error: status === 500 ? "Request failed" : error.message }, origin);
     }
-}
-
-if (!process.env.VERCEL) {
-    createServer(handler).listen(port, "0.0.0.0", () => {
-        console.log(`Yokai Tales API listening on port ${port}`);
-    });
 }

@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build-static.js",
-    "start": "node server/index.js"
+    "start": "node server/local.js"
   },
   "engines": {
     "node": "22.x"
