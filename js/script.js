@@ -1,682 +1,434 @@
-/*
-====================================================
-    YOKAI TAILS - JAVASCRIPT
-
-    Este arquivo controla:
-    - Cadastro de usuarios
-    - Login
-    - Verificacao de senha
-    - Redirecionamento
-
-    Os usuarios sao armazenados na tabela "Usuario"
-    do Supabase.
-====================================================
-*/
-
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import {
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-} from "./supabase-config.js";
-
-const USUARIO_LOGADO_KEY = "usuarioLogadoEmail";
-const logoutButton = document.getElementById("logoutButton");
-const LINK_DOWNLOAD = "https://imgs.search.brave.com/P8kr9IV17POo-OX4dYjQyc9_bpKRWvaM4UWrlIGrvVI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/aWNlZ2lmLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMy8w/MS9pY2VnaWYtMTY1/LmdpZg.gif";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, API_BASE_URL } from "./supabase-config.js";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const GAME_DOWNLOAD_URL = ""; // Configure when a release file is available.
+const $ = (selector) => document.querySelector(selector);
 
-if (logoutButton) {
-    logoutButton.hidden = !localStorage.getItem(USUARIO_LOGADO_KEY);
-
-    logoutButton.addEventListener("click", function() {
-        localStorage.removeItem(USUARIO_LOGADO_KEY);
-        localStorage.removeItem("usuarioLogadoNome");
-
-        const paginaLogin = window.location.pathname.includes("/paginas/")
-            ? "login.html"
-            : "paginas/login.html";
-
-        window.location.href = paginaLogin;
+async function apiRequest(path, { method = "GET", body } = {}) {
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session?.access_token) throw new Error("Authentication required");
+    const response = await fetch(`${API_BASE_URL.replace(/\/+$/, "")}${path}`, {
+        method,
+        headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            ...(body === undefined ? {} : { "Content-Type": "application/json" })
+        },
+        ...(body === undefined ? {} : { body: JSON.stringify(body) })
     });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "API request failed");
+    return result;
 }
 
-function mostrarMensagem(elemento, texto, cor) {
-    if (!elemento) return;
-    elemento.innerText = texto;
-    elemento.style.color = cor;
+function showMessage(element, message, kind = "info") {
+    if (!element) return;
+    element.textContent = message;
+    element.dataset.state = kind;
 }
 
-/*
-====================================================
-                CADASTRO
-====================================================
-*/
-
-const formCadastro = document.getElementById("formCadastro");
-
-if (formCadastro) {
-    formCadastro.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const usuario = document.getElementById("nome_usuario").value.trim();
-        const email = document.getElementById("email_usuario").value.trim();
-        const senha = document.getElementById("senha_usuario").value;
-        const confirmaSenha = document.getElementById("confirmar").value;
-        const mensagem = document.getElementById("mensagemCadastro");
-
-        if (!usuario || !email || !senha || !confirmaSenha) {
-            mostrarMensagem(mensagem, "Preencha todos os campos antes de continuar.", "#ff5c6c");
-            return;
-        }
-
-        if (senha !== confirmaSenha) {
-            mostrarMensagem(mensagem, "As senhas nao sao iguais.", "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Criando conta...", "#ffffff");
-
-        const { data: usuarioExistente, error: erroBusca } = await supabase
-            .from("Usuario")
-            .select("nome_usuario")
-            .eq("nome_usuario", usuario)
-            .maybeSingle();
-
-        if (erroBusca) {
-            console.error(erroBusca);
-            mostrarMensagem(mensagem, "Erro ao verificar usuario.", "#ff5c6c");
-            return;
-        }
-
-        if (usuarioExistente) {
-            mostrarMensagem(mensagem, "Esse usuario ja existe.", "#ff5c6c");
-            return;
-        }
-
-        const { error: erroCadastro } = await supabase
-            .from("Usuario")
-            .insert({
-                nome_usuario: usuario,
-                email_usuario: email,
-                senha_usuario: senha
-            });
-
-        if (erroCadastro) {
-            console.error(erroCadastro);
-            mostrarMensagem(mensagem, "Erro ao criar conta.", "#ff5c6c");
-            return;
-        }
-
-        
-
-        mostrarMensagem(mensagem, "Cadastro realizado com sucesso!", "#72e6a5");
-
-        setTimeout(function() {
-            window.location.href = "login.html";
-        }, 1000);
-    });
-}
-
-/*
-====================================================
-                LOGIN
-====================================================
-*/
-
-const formLogin = document.getElementById("formLogin");
-
-if (formLogin) {
-    formLogin.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const usuario = document.getElementById("loginEmail").value.trim();
-        const senha = document.getElementById("loginSenha").value;
-        const mensagem = document.getElementById("mensagemLogin");
-
-        if (!usuario || !senha) {
-            mostrarMensagem(mensagem, "Digite e-mail e senha para entrar.", "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Entrando...", "#ffffff");
-
-        const { data: usuarioEncontrado, error: erroLogin } = await supabase
-            .from("Usuario")
-            .select("nome_usuario, email_usuario, senha_usuario")
-            .eq("email_usuario", usuario)
-            .eq("senha_usuario", senha)
-            .maybeSingle();
-
-        if (erroLogin) {
-            console.error(erroLogin);
-            mostrarMensagem(mensagem, "Erro ao fazer login.", "#ff5c6c");
-            return;
-        }
-
-        if (!usuarioEncontrado) {
-            mostrarMensagem(mensagem, "Usuario ou senha incorretos.", "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Login realizado com sucesso!", "#72e6a5");
-
-        localStorage.setItem(USUARIO_LOGADO_KEY, usuarioEncontrado.email_usuario);
-        localStorage.setItem("usuarioLogadoNome", usuarioEncontrado.nome_usuario);
-
-        setTimeout(function() {
-            window.location.href = "perfil.html";
-        }, 1000);
-    });
-}
-
-const downloadButton = document.getElementById("downloadButton");
-const downloadModal = document.getElementById("downloadModal");
-const closeDownloadModal = document.getElementById("closeDownloadModal");
-const formDownloadLogin = document.getElementById("formDownloadLogin");
-const cartaoModal = document.getElementById("cartaoModal");
-const fecharCartaoModal = document.getElementById("fecharCartaoModal");
-const formCadastroCartao = document.getElementById("formCadastroCartao");
-const abrirModalSenha = document.getElementById("abrirModalSenha");
-const modalSenha = document.getElementById("modalSenha");
-const fecharModalSenha = document.getElementById("fecharModalSenha");
-const formAlterarSenha = document.getElementById("formAlterarSenha");
-const abrirModalExclusao = document.getElementById("abrirModalExclusao");
-const modalExclusao = document.getElementById("modalExclusao");
-const fecharModalExclusao = document.getElementById("fecharModalExclusao");
-const formExclusaoConta = document.getElementById("formExclusaoConta");
-
-function abrirLinkDownload() {
-    window.location.href = LINK_DOWNLOAD;
-}
-
-async function buscarUsuarioPorEmail(email) {
-    return supabase
-        .from("Usuario")
-        .select("nome_usuario, email_usuario")
-        .eq("email_usuario", email)
-        .maybeSingle();
-}
-
-async function buscarCartaoPorEmail(email) {
-    return supabase
-        .from("Cartao")
-        .select("Numero")
-    .eq("dono_cartao", email)
-        .limit(1)
-        .maybeSingle();
-}
-
-function fecharModalDownload() {
-    if (downloadModal) {
-        downloadModal.hidden = true;
+function setBusy(form, busy, buttonLabel) {
+    const button = form?.querySelector('[type="submit"]');
+    if (!button) return;
+    if (busy) {
+        button.dataset.originalLabel = button.textContent.trim();
+        button.disabled = true;
+        button.textContent = buttonLabel;
+    } else {
+        button.disabled = false;
+        button.textContent = button.dataset.originalLabel || buttonLabel;
     }
 }
 
-function fecharModalCartao() {
-    if (cartaoModal) {
-        cartaoModal.hidden = true;
+async function getCurrentUser() {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error && error.name !== "AuthSessionMissingError") throw error;
+    return user;
+}
+
+async function updateNavigation() {
+    const logoutButton = $("#logoutButton");
+    if (!logoutButton) return;
+    try {
+        logoutButton.hidden = !(await getCurrentUser());
+    } catch (error) {
+        console.error("Não foi possível carregar a sessão.", error);
+        logoutButton.hidden = true;
     }
 }
 
-async function verificarCartaoEContinuar(email) {
-    const mensagemDownload = document.getElementById("mensagemDownload");
-
-    const { data: usuario, error: erroBuscaUsuario } = await buscarUsuarioPorEmail(email);
-
-    if (erroBuscaUsuario) {
-        console.error(erroBuscaUsuario);
-        mostrarMensagem(mensagemDownload, "Erro ao verificar usuário.", "#ff5c6c");
-        return;
-    }
-
-    if (!usuario) {
-        localStorage.removeItem(USUARIO_LOGADO_KEY);
-        localStorage.removeItem("usuarioLogadoNome");
-        mostrarMensagem(mensagemDownload, "Usuário não encontrado.", "#ff5c6c");
-        if (downloadModal) {
-            downloadModal.hidden = false;
-        }
-        document.getElementById("downloadLoginEmail").focus();
-        return;
-    }
-
-    const { data: cartaoEncontrado, error: erroBuscaCartao } = await buscarCartaoPorEmail(email);
-
-    if (erroBuscaCartao) {
-        console.error(erroBuscaCartao);
-        if (downloadModal) {
-            downloadModal.hidden = false;
-        }
-        mostrarMensagem(mensagemDownload, "Erro ao verificar cartão.", "#ff5c6c");
-        return;
-    }
-
-    if (cartaoEncontrado) {
-        abrirLinkDownload();
-        return;
-    }
-
-    if (cartaoModal) {
-        cartaoModal.hidden = false;
-        document.getElementById("numeroCartao").focus();
-    }
-}
-
-if (downloadButton) {
-    downloadButton.addEventListener("click", async function() {
-        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
-        const mensagem = document.getElementById("mensagemDownload");
-
-        if (emailLogado) {
-            const { data: usuarioEncontrado, error: erroBusca } = await buscarUsuarioPorEmail(emailLogado);
-
-            if (erroBusca) {
-                console.error(erroBusca);
-                downloadModal.hidden = false;
-                mostrarMensagem(mensagem, "Erro ao verificar usuario.", "#ff5c6c");
-                return;
-            }
-
-            if (!usuarioEncontrado) {
-                localStorage.removeItem(USUARIO_LOGADO_KEY);
-                localStorage.removeItem("usuarioLogadoNome");
-                downloadModal.hidden = false;
-                mostrarMensagem(mensagem, "O usuario não existe", "#ff5c6c");
-                document.getElementById("downloadLoginEmail").focus();
-                return;
-            }
-
-            await verificarCartaoEContinuar(emailLogado);
-            return;
-        }
-
-        downloadModal.hidden = false;
-        document.getElementById("downloadLoginEmail").focus();
-    });
-}
-
-if (closeDownloadModal) {
-    closeDownloadModal.addEventListener("click", fecharModalDownload);
-}
-
-if (downloadModal) {
-    downloadModal.addEventListener("click", function(event) {
-        if (event.target === downloadModal) {
-            fecharModalDownload();
-        }
-    });
-}
-
-if (formDownloadLogin) {
-    formDownloadLogin.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const email = document.getElementById("downloadLoginEmail").value.trim();
-        const senha = document.getElementById("downloadLoginSenha").value;
-        const mensagem = document.getElementById("mensagemDownload");
-
-        mostrarMensagem(mensagem, "Confirmando login...", "#ffffff");
-
-        const { data: usuarioEncontrado, error: erroLogin } = await supabase
-            .from("Usuario")
-            .select("nome_usuario, email_usuario, senha_usuario")
-            .eq("email_usuario", email)
-            .eq("senha_usuario", senha)
-            .maybeSingle();
-
-        if (erroLogin) {
-            console.error(erroLogin);
-            mostrarMensagem(mensagem, "Erro ao fazer login.", "#ff5c6c");
-            return;
-        }
-
-        if (!usuarioEncontrado) {
-            mostrarMensagem(mensagem, "O usuario não existe", "#ff5c6c");
-            return;
-        }
-
-        localStorage.setItem(USUARIO_LOGADO_KEY, usuarioEncontrado.email_usuario);
-        localStorage.setItem("usuarioLogadoNome", usuarioEncontrado.nome_usuario);
-        fecharModalDownload();
-        await verificarCartaoEContinuar(usuarioEncontrado.email_usuario);
-    });
-}
-
-if (fecharCartaoModal) {
-    fecharCartaoModal.addEventListener("click", fecharModalCartao);
-}
-
-if (cartaoModal) {
-    cartaoModal.addEventListener("click", function(event) {
-        if (event.target === cartaoModal) {
-            fecharModalCartao();
-        }
-    });
-}
-
-if (formCadastroCartao) {
-    formCadastroCartao.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
-        const numeroCartao = document.getElementById("numeroCartao").value.trim();
-        const numSeg = document.getElementById("numSeg").value.trim();
-        const nomeCartao = document.getElementById("nomeCartao").value.trim();
-        const mensagem = document.getElementById("mensagemCartao");
-
-        if (!emailLogado) {
-            fecharModalCartao();
-            if (downloadModal) {
-                downloadModal.hidden = false;
-            }
-            document.getElementById("downloadLoginEmail").focus();
-            return;
-        }
-
-        const { data: usuario, error: erroBuscaUsuario } = await buscarUsuarioPorEmail(emailLogado);
-
-        if (erroBuscaUsuario || !usuario) {
-            localStorage.removeItem(USUARIO_LOGADO_KEY);
-            localStorage.removeItem("usuarioLogadoNome");
-            fecharModalCartao();
-            if (downloadModal) {
-                downloadModal.hidden = false;
-            }
-            mostrarMensagem(
-                document.getElementById("mensagemDownload"),
-                "Não foi possível confirmar o usuário.",
-                "#ff5c6c"
-            );
-            document.getElementById("downloadLoginEmail").focus();
-            return;
-        }
-
-        if (!numeroCartao || !numSeg || !nomeCartao) {
-            mostrarMensagem(mensagem, "Preencha todos os campos do cartão.", "#ff5c6c");
-            return;
-        }
-
-        if (!/^\d{16}$/.test(numeroCartao)) {
-            mostrarMensagem(mensagem, "O cartão deve ter exatamente 16 dígitos.", "#ff5c6c");
-            return;
-        }
-
-        if (!/^\d{3}$/.test(numSeg)) {
-            mostrarMensagem(mensagem, "O número de segurança deve ter exatamente 3 dígitos.", "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Registrando cartão...", "#ffffff");
-
-        const { error: erroCadastroCartao } = await supabase
-            .from("Cartao")
-            .insert({
-                Numero: numeroCartao,
-                Num_seg: numSeg,
-                nome_cartao: nomeCartao,
-                dono_cartao: usuario.email_usuario
-            });
-
-        if (erroCadastroCartao) {
-            console.error(erroCadastroCartao);
-            const textoErro = erroCadastroCartao.code === "22003"
-                ? "A coluna Numero precisa aceitar 16 dígitos. Atualize o tipo da coluna no Supabase."
-                : "Erro ao registrar cartão.";
-            mostrarMensagem(mensagem, textoErro, "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Cartão registrado com sucesso!", "#72e6a5");
-        formCadastroCartao.reset();
-
-        setTimeout(function() {
-            fecharModalCartao();
-            abrirLinkDownload();
-        }, 1000);
-    });
-}
-
-function fecharModalAlterarSenha() {
-    if (modalSenha) {
-        modalSenha.hidden = true;
-    }
-}
-
-if (abrirModalSenha) {
-    abrirModalSenha.addEventListener("click", function() {
-        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
-
-        if (!emailLogado) {
-            window.location.href = "login.html";
-            return;
-        }
-
-        modalSenha.hidden = false;
-        document.getElementById("novaSenha").focus();
-    });
-}
-
-if (fecharModalSenha) {
-    fecharModalSenha.addEventListener("click", fecharModalAlterarSenha);
-}
-
-if (modalSenha) {
-    modalSenha.addEventListener("click", function(event) {
-        if (event.target === modalSenha) {
-            fecharModalAlterarSenha();
-        }
-    });
-}
-
-if (formAlterarSenha) {
-    formAlterarSenha.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
-        const novaSenha = document.getElementById("novaSenha").value;
-        const confirmarNovaSenha = document.getElementById("confirmarNovaSenha").value;
-        const mensagem = document.getElementById("mensagemSenha");
-
-        if (!emailLogado) {
-            window.location.href = "login.html";
-            return;
-        }
-
-        if (!novaSenha || !confirmarNovaSenha) {
-            mostrarMensagem(mensagem, "Preencha os dois campos de senha.", "#ff5c6c");
-            return;
-        }
-
-        if (novaSenha !== confirmarNovaSenha) {
-            mostrarMensagem(mensagem, "As senhas nao sao iguais.", "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Atualizando senha...", "#ffffff");
-
-        const { data: usuarioExistente, error: erroBuscaUsuario } = await buscarUsuarioPorEmail(emailLogado);
-
-        if (erroBuscaUsuario) {
-            console.error(erroBuscaUsuario);
-            mostrarMensagem(mensagem, "Erro ao verificar usuario.", "#ff5c6c");
-            return;
-        }
-
-        if (!usuarioExistente) {
-            mostrarMensagem(mensagem, "Usuario nao encontrado.", "#ff5c6c");
-            return;
-        }
-
-        const { error: erroAtualizacao } = await supabase
-            .from("Usuario")
-            .update({ senha_usuario: novaSenha })
-            .eq("email_usuario", emailLogado);
-
-        if (erroAtualizacao) {
-            console.error(erroAtualizacao);
-            mostrarMensagem(mensagem, "Erro ao atualizar senha.", "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Senha atualizada com sucesso!", "#72e6a5");
-        formAlterarSenha.reset();
-
-        setTimeout(function() {
-            fecharModalAlterarSenha();
-        }, 1000);
-    });
-}
-
-function fecharModalDeExclusao() {
-    if (modalExclusao) {
-        modalExclusao.hidden = true;
-    }
-}
-
-if (abrirModalExclusao) {
-    abrirModalExclusao.addEventListener("click", function() {
-        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
-
-        if (!emailLogado) {
-            window.location.href = "login.html";
-            return;
-        }
-
-        modalExclusao.hidden = false;
-        document.getElementById("loginAdministrador").focus();
-    });
-}
-
-if (fecharModalExclusao) {
-    fecharModalExclusao.addEventListener("click", fecharModalDeExclusao);
-}
-
-if (modalExclusao) {
-    modalExclusao.addEventListener("click", function(event) {
-        if (event.target === modalExclusao) {
-            fecharModalDeExclusao();
-        }
-    });
-}
-
-if (formExclusaoConta) {
-    formExclusaoConta.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const emailUsuario = localStorage.getItem(USUARIO_LOGADO_KEY);
-        const loginAdministrador = document.getElementById("loginAdministrador").value.trim();
-        const senhaAdministrador = document.getElementById("senhaAdministrador").value;
-        const mensagem = document.getElementById("mensagemExclusao");
-
-        if (!emailUsuario) {
-            window.location.href = "login.html";
-            return;
-        }
-
-        if (!loginAdministrador || !senhaAdministrador) {
-            mostrarMensagem(mensagem, "Preencha o login e a senha do administrador.", "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Validando administrador...", "#ffffff");
-
-        const { data: administrador, error: erroAdministrador } = await supabase
-            .from("Administrador")
-            .select("login_administrador")
-            .eq("login_administrador", loginAdministrador)
-            .eq("senha_administrador", senhaAdministrador)
-            .limit(1)
-            .maybeSingle();
-
-        if (erroAdministrador) {
-            console.error(erroAdministrador);
-            mostrarMensagem(mensagem, "Erro ao validar administrador.", "#ff5c6c");
-            return;
-        }
-
-        if (!administrador || administrador.login_administrador !== loginAdministrador) {
-            mostrarMensagem(mensagem, "Login ou senha de administrador invalidos.", "#ff5c6c");
-            return;
-        }
-
-        mostrarMensagem(mensagem, "Excluindo conta...", "#ffffff");
-
-        const { data: usuarioExistente, error: erroBuscaUsuario } = await buscarUsuarioPorEmail(emailUsuario);
-
-        if (erroBuscaUsuario) {
-            console.error(erroBuscaUsuario);
-            mostrarMensagem(mensagem, "Erro ao verificar usuario.", "#ff5c6c");
-            return;
-        }
-
-        if (!usuarioExistente) {
-            mostrarMensagem(mensagem, "Usuario nao encontrado.", "#ff5c6c");
-            return;
-        }
-
-        const { error: erroExclusao } = await supabase
-            .from("Usuario")
-            .delete()
-            .eq("email_usuario", emailUsuario);
-
-        if (erroExclusao) {
-            console.error(erroExclusao);
-            mostrarMensagem(mensagem, "Erro ao excluir conta.", "#ff5c6c");
-            return;
-        }
-
-        localStorage.removeItem(USUARIO_LOGADO_KEY);
-        localStorage.removeItem("usuarioLogadoNome");
-        mostrarMensagem(mensagem, "Conta excluida com sucesso.", "#72e6a5");
-
-        setTimeout(function() {
-            window.location.href = "../index.html";
-        }, 1000);
-    });
-}
-
-async function carregarPerfilUsuario() {
-    const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
-
-    if (!emailLogado) {
-        window.location.href = "login.html";
-        return;
-    }
-
-    const nomePerfil = document.querySelector(".profile-card h1");
-    const nomeSpan = document.querySelector(".profile-info div:nth-of-type(1) span");
-    const emailSpan = document.querySelector(".profile-info div:nth-of-type(2) span");
-
-    if (!nomePerfil || !nomeSpan || !emailSpan) {
-        return;
-    }
-
-    const { data: usuario, error } = await supabase
-        .from("Usuario")
-        .select("nome_usuario, email_usuario")
-        .eq("email_usuario", emailLogado)
-        .maybeSingle();
-
+const logoutButton = $("#logoutButton");
+logoutButton?.addEventListener("click", async () => {
+    logoutButton.disabled = true;
+    const { error } = await supabase.auth.signOut();
     if (error) {
         console.error(error);
-        nomePerfil.innerText = "USUÁRIO";
-        nomeSpan.innerText = "Não foi possível carregar";
-        emailSpan.innerText = emailLogado;
+        logoutButton.disabled = false;
+        return;
+    }
+    window.location.href = window.location.pathname.includes("/paginas/")
+        ? "login.html"
+        : "paginas/login.html";
+});
+
+void updateNavigation();
+
+const signupForm = $("#formCadastro");
+signupForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const name = $("#nome_usuario").value.trim();
+    const email = $("#email_usuario").value.trim();
+    const password = $("#senha_usuario").value;
+    const confirmation = $("#confirmar").value;
+    const message = $("#mensagemCadastro");
+
+    if (!name || !email || !password || !confirmation) {
+        showMessage(message, "Preencha todos os campos.", "error");
+        return;
+    }
+    if (password !== confirmation) {
+        showMessage(message, "As senhas não coincidem.", "error");
+        return;
+    }
+    if (password.length < 8) {
+        showMessage(message, "A senha deve ter pelo menos 8 caracteres.", "error");
         return;
     }
 
-    if (!usuario) {
-        nomePerfil.innerText = "USUÁRIO";
-        nomeSpan.innerText = "Usuário não encontrado";
-        emailSpan.innerText = emailLogado;
+    setBusy(signupForm, true, "Criando conta…");
+    showMessage(message, "Criando sua conta…");
+    const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } }
+    });
+    setBusy(signupForm, false);
+
+    if (error) {
+        showMessage(message, error.message, "error");
+        return;
+    }
+    const confirmationRequired = !data.session;
+    showMessage(
+        message,
+        confirmationRequired
+            ? "Conta criada. Confirme o e-mail antes de entrar."
+            : "Conta criada com sucesso. Redirecionando para o login…",
+        "success"
+    );
+    if (!confirmationRequired) {
+        window.setTimeout(() => { window.location.href = "login.html"; }, 900);
+    }
+});
+
+const loginForm = $("#formLogin");
+loginForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const email = $("#loginEmail").value.trim();
+    const password = $("#loginSenha").value;
+    const message = $("#mensagemLogin");
+    if (!email || !password) {
+        showMessage(message, "Digite e-mail e senha para entrar.", "error");
         return;
     }
 
-    nomePerfil.innerText = usuario.nome_usuario.toUpperCase();
-    nomeSpan.innerText = usuario.nome_usuario;
-    emailSpan.innerText = usuario.email_usuario;
+    setBusy(loginForm, true, "Entrando…");
+    showMessage(message, "Validando acesso…");
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setBusy(loginForm, false);
+    if (error) {
+        showMessage(message, "Não foi possível entrar. Confira os dados e a confirmação do e-mail.", "error");
+        return;
+    }
+    showMessage(message, "Login realizado. Redirecionando…", "success");
+    const query = new URLSearchParams(window.location.search);
+    const returnToPurchase = query.get("return") === "purchase";
+    const edition = query.get("edition");
+    const destination = returnToPurchase && purchasePlans[edition]
+        ? `download.html?edition=${encodeURIComponent(edition)}`
+        : "perfil.html";
+    window.setTimeout(() => { window.location.href = destination; }, 500);
+});
+
+const profileCard = $(".profile-card");
+if (profileCard) {
+    const loadProfile = async () => {
+        let profile;
+        try {
+            profile = await apiRequest("/api/profile");
+        } catch {
+            window.location.replace("login.html");
+            return;
+        }
+        const name = profile.full_name || "Usuário";
+        const heading = $(".profile-card h1");
+        const spans = $(".profile-info")?.querySelectorAll("div span");
+        if (heading) heading.textContent = name.toLocaleUpperCase("pt-BR");
+        if (spans?.[0]) spans[0].textContent = name;
+        if (spans?.[1]) spans[1].textContent = profile.email || "";
+    };
+    void loadProfile();
 }
 
-if (document.querySelector(".profile-card")) {
-    carregarPerfilUsuario();
+const passwordForm = $("#formAlterarSenha");
+const nameModal = $("#modalNome");
+const nameForm = $("#formNome");
+$("#abrirModalNome")?.addEventListener("click", () => {
+    const userName = $(".profile-info div span")?.textContent || "";
+    $("#novoNome").value = userName;
+    if (nameModal) nameModal.hidden = false;
+    $("#novoNome")?.focus();
+});
+$("#fecharModalNome")?.addEventListener("click", () => {
+    if (nameModal) nameModal.hidden = true;
+});
+nameModal?.addEventListener("click", (event) => {
+    if (event.target === nameModal) nameModal.hidden = true;
+});
+nameForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const name = $("#novoNome").value.trim();
+    const message = $("#mensagemNome");
+    if (name.length < 2) {
+        showMessage(message, "Informe pelo menos dois caracteres.", "error");
+        return;
+    }
+    setBusy(nameForm, true, "Salvando…");
+    let result;
+    try {
+        result = await apiRequest("/api/profile", { method: "PATCH", body: { full_name: name } });
+    } catch (error) {
+        setBusy(nameForm, false);
+        showMessage(message, error.message, "error");
+        return;
+    }
+    setBusy(nameForm, false);
+    const heading = $(".profile-card h1");
+    const spans = $(".profile-info")?.querySelectorAll("div span");
+    if (heading) heading.textContent = name.toLocaleUpperCase("pt-BR");
+    if (spans?.[0]) spans[0].textContent = result.full_name || name;
+    showMessage(message, "Nome atualizado.", "success");
+});
+
+const deleteModal = $("#modalExclusao");
+const deleteForm = $("#formExclusaoConta");
+$("#abrirModalExclusao")?.addEventListener("click", () => {
+    if (deleteModal) deleteModal.hidden = false;
+    $("#confirmarExclusao")?.focus();
+});
+$("#fecharModalExclusao")?.addEventListener("click", () => {
+    if (deleteModal) deleteModal.hidden = true;
+});
+deleteModal?.addEventListener("click", (event) => {
+    if (event.target === deleteModal) deleteModal.hidden = true;
+});
+deleteForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const message = $("#mensagemExclusao");
+    if ($("#confirmarExclusao").value.trim() !== "EXCLUIR") {
+        showMessage(message, "Digite EXCLUIR para confirmar.", "error");
+        return;
+    }
+    const user = await getCurrentUser().catch(() => null);
+    if (!user?.email) {
+        showMessage(message, "Entre novamente para excluir a conta.", "error");
+        return;
+    }
+    setBusy(deleteForm, true, "Excluindo…");
+    const { error: reauthError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: $("#senhaConfirmarExclusao").value
+    });
+    if (reauthError) {
+        setBusy(deleteForm, false);
+        showMessage(message, "Senha atual inválida. A conta não foi excluída.", "error");
+        return;
+    }
+    let deleteError = null;
+    try {
+        await apiRequest("/api/account/delete", { method: "POST" });
+    } catch (error) {
+        deleteError = error;
+    }
+    setBusy(deleteForm, false);
+    if (deleteError) {
+        console.error("Falha na exclusão da conta.", deleteError);
+        showMessage(message, "Não foi possível excluir. Confira se a API Node.js está publicada e configurada.", "error");
+        return;
+    }
+    await supabase.auth.signOut();
+    window.location.replace("../index.html");
+});
+
+const passwordModal = $("#modalSenha");
+$("#abrirModalSenha")?.addEventListener("click", () => {
+    if (passwordModal) passwordModal.hidden = false;
+    $("#novaSenha")?.focus();
+});
+$("#fecharModalSenha")?.addEventListener("click", () => {
+    if (passwordModal) passwordModal.hidden = true;
+});
+passwordModal?.addEventListener("click", (event) => {
+    if (event.target === passwordModal) passwordModal.hidden = true;
+});
+passwordForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const password = $("#novaSenha").value;
+    const confirmation = $("#confirmarNovaSenha").value;
+    const message = $("#mensagemSenha");
+    if (password.length < 8) {
+        showMessage(message, "A senha deve ter pelo menos 8 caracteres.", "error");
+        return;
+    }
+    if (password !== confirmation) {
+        showMessage(message, "As senhas não coincidem.", "error");
+        return;
+    }
+    setBusy(passwordForm, true, "Atualizando…");
+    const { error } = await supabase.auth.updateUser({ password });
+    setBusy(passwordForm, false);
+    showMessage(message, error ? "Não foi possível atualizar a senha." : "Senha atualizada.", error ? "error" : "success");
+    if (!error) passwordForm.reset();
+});
+
+const purchaseList = $("#purchaseList");
+const purchaseMessage = $("#purchaseMessage");
+const purchasePlans = {
+    standard: { label: "Standard", value: 20 },
+    plus: { label: "Plus", value: 40 }
+};
+
+function formatBRL(value) {
+    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+}
+
+function renderOrder(order, target, downloadHistory = []) {
+    const article = document.createElement("article");
+    article.className = "purchase-receipt";
+    const title = document.createElement("h3");
+    title.textContent = `Yokai Tales — ${purchasePlans[order.edition]?.label || order.edition}`;
+    const details = document.createElement("p");
+    details.textContent = `${formatBRL(Number(order.amount_brl))} · Pedido simulado · ${new Date(order.created_at).toLocaleString("pt-BR")}`;
+    const status = document.createElement("p");
+    status.className = "purchase-status";
+    status.textContent = "Pedido confirmado para fins acadêmicos. Nenhuma cobrança foi realizada.";
+    article.append(title, details, status);
+    const orderDownloads = downloadHistory.filter((item) => item.payment_id === order.id);
+    if (orderDownloads.length) {
+        const history = document.createElement("p");
+        history.textContent = `Solicitações de download: ${orderDownloads.length} (última: ${new Date(orderDownloads[0].requested_at).toLocaleString("pt-BR")})`;
+        article.append(history);
+    }
+
+    const download = document.createElement("a");
+    download.className = "btn-primary";
+    if (GAME_DOWNLOAD_URL) {
+        download.href = GAME_DOWNLOAD_URL;
+        download.setAttribute("download", "");
+        download.textContent = "BAIXAR JOGO";
+        download.addEventListener("click", async (event) => {
+            event.preventDefault();
+            download.setAttribute("aria-disabled", "true");
+            try {
+                await apiRequest("/api/downloads", { method: "POST", body: { payment_id: order.id } });
+            } catch (error) {
+                console.error("Não foi possível registrar a solicitação de download.", error);
+                showMessage(purchaseMessage, "Não foi possível registrar o download. Tente novamente.", "error");
+                download.removeAttribute("aria-disabled");
+                return;
+            }
+            window.location.assign(GAME_DOWNLOAD_URL);
+        });
+    } else {
+        download.href = "#download-not-ready";
+        download.textContent = "ARQUIVO DO JOGO PENDENTE";
+        download.setAttribute("aria-disabled", "true");
+        download.addEventListener("click", (event) => {
+            event.preventDefault();
+            showMessage(purchaseMessage, "O pedido foi registrado, mas o arquivo de download ainda não foi publicado.", "error");
+        });
+    }
+    article.append(download);
+    target.append(article);
+}
+
+async function loadPurchaseHistory() {
+    if (!purchaseList) return;
+    purchaseList.replaceChildren();
+    let result;
+    try {
+        result = await apiRequest("/api/payments");
+    } catch (error) {
+        showMessage(purchaseMessage, `${error.message}. Confira a API Node.js e a migração Supabase.`, "error");
+        return;
+    }
+    if (!result.payments.length) {
+        showMessage(purchaseMessage, "Nenhum pedido registrado nesta conta.");
+        return;
+    }
+    for (const order of result.payments) renderOrder(order, purchaseList, result.downloads);
+}
+
+if ($("#purchaseForm")) {
+    const purchaseForm = $("#purchaseForm");
+    const editionInput = $("#edition");
+    const priceOutput = $("#editionPrice");
+    const updatePrice = () => {
+        const plan = purchasePlans[editionInput.value];
+        priceOutput.textContent = plan ? formatBRL(plan.value) : "Selecione uma versão";
+    };
+    const requestedEdition = new URLSearchParams(window.location.search).get("edition");
+    if (purchasePlans[requestedEdition]) editionInput.value = requestedEdition;
+    editionInput.addEventListener("change", updatePrice);
+    updatePrice();
+
+    purchaseForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const user = await getCurrentUser().catch(() => null);
+        if (!user) {
+            const loginLink = $("#purchaseLoginLink a");
+            if (loginLink) {
+                loginLink.href = `login.html?return=purchase&edition=${encodeURIComponent(editionInput.value)}`;
+                $("#purchaseLoginLink").hidden = false;
+            }
+            showMessage(purchaseMessage, "Entre na sua conta para registrar o pedido.", "error");
+            return;
+        }
+        const edition = editionInput.value;
+        if (!purchasePlans[edition]) {
+            showMessage(purchaseMessage, "Escolha uma versão válida.", "error");
+            return;
+        }
+
+        setBusy(purchaseForm, true, "Confirmando pedido…");
+        showMessage(purchaseMessage, "Registrando a simulação…");
+        let order;
+        let orderError;
+        try {
+            order = await apiRequest("/api/payments", { method: "POST", body: { edition } });
+        } catch (error) {
+            orderError = error;
+        }
+        setBusy(purchaseForm, false);
+
+        if (orderError) {
+            console.error("Falha ao registrar o pedido simulado.", orderError);
+            showMessage(purchaseMessage, `${orderError.message}. Confira a API Node.js e a migração Supabase.`, "error");
+            return;
+        }
+        showMessage(purchaseMessage, `Pedido confirmado: ${formatBRL(Number(order.amount_brl))}.`, "success");
+        await loadPurchaseHistory();
+    });
+
+    void getCurrentUser().then((user) => {
+        const loginLink = $("#purchaseLoginLink");
+        if (loginLink) {
+            loginLink.hidden = Boolean(user);
+            const anchor = loginLink.querySelector("a");
+            if (anchor) anchor.href = `login.html?return=purchase&edition=${encodeURIComponent(editionInput.value)}`;
+        }
+        if (user) void loadPurchaseHistory();
+    }).catch((error) => {
+        console.error("Não foi possível verificar a sessão.", error);
+    });
 }

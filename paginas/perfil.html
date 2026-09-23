@@ -116,7 +116,7 @@
 
                 <img
                     id="fotoPerfilUsuario"
-                    src="https://i.pinimg.com/736x/3c/b4/14/3cb4148f22f10714f1d5ed7e6d807205.jpg"
+                    src="../imagens/Yokai.png"
                     alt="Foto de perfil do jogador"
                 >
 
@@ -136,33 +136,9 @@
                 </p>
 
 
-                <!--
-                    Botão pequeno para alterar a foto.
-
-                    O label abre o seletor de imagens
-                    através do input logo abaixo.
-                -->
-
-                <label for="fotoPerfil" class="btn-alterar-foto">
-                    ALTERAR FOTO
-                </label>
-
             </div>
 
 
-            <!--
-                Input responsável por selecionar
-                uma nova foto.
-
-                Ele fica escondido.
-            -->
-
-            <input
-                type="file"
-                id="fotoPerfil"
-                accept="image/*"
-                hidden
-            >
 
 
 
@@ -240,6 +216,8 @@
 
             <div class="account-buttons">
 
+                <button type="button" class="btn-secondary" id="abrirModalNome">EDITAR NOME</button>
+
 
                 <!-- Redefinir senha -->
                 <button
@@ -250,15 +228,7 @@
                     REDEFINIR SENHA
                 </button>
 
-
-                <!-- Deletar conta -->
-                <button
-                    type="button"
-                    class="btn-danger"
-                    id="abrirModalExclusao"
-                >
-                    DELETAR CONTA
-                </button>
+                <button type="button" class="btn-danger" id="abrirModalExclusao">DELETAR CONTA</button>
 
 
             </div>
@@ -279,6 +249,8 @@
                 >
                     YOKAI TALES
                 </a>
+
+                <a href="download.html" class="btn-secondary">PEDIDOS E COMPRAS</a>
 
 
                 <!-- Voltar para a página inicial -->
@@ -319,28 +291,36 @@
         </div>
     </div>
 
-    <div id="modalExclusao" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloModalExclusao" hidden>
+    <div id="modalNome" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloModalNome" hidden>
         <div class="modal-content">
-            <button type="button" id="fecharModalExclusao" class="modal-close" aria-label="Fechar janela">&times;</button>
-
-            <p class="orange-text">AUTORIZAÇÃO</p>
-            <h2 id="tituloModalExclusao">CONFIRMAR EXCLUSÃO</h2>
-            <p>Informe o login e a senha de um administrador para excluir esta conta.</p>
-
-            <form id="formExclusaoConta">
-                <label for="loginAdministrador">Login do administrador</label>
-                <input type="text" id="loginAdministrador" placeholder="Digite o login do administrador" required>
-
-                <label for="senhaAdministrador">Senha do administrador</label>
-                <input type="password" id="senhaAdministrador" placeholder="Digite a senha do administrador" required>
-
-                <button type="submit" class="btn-danger">CONFIRMAR EXCLUSÃO</button>
-                <p id="mensagemExclusao" aria-live="polite"></p>
+            <button type="button" id="fecharModalNome" class="modal-close" aria-label="Fechar janela">&times;</button>
+            <p class="orange-text">CONTA</p>
+            <h2 id="tituloModalNome">EDITAR NOME</h2>
+            <form id="formNome">
+                <label for="novoNome">Nome de exibição</label>
+                <input type="text" id="novoNome" minlength="2" maxlength="80" required>
+                <button type="submit" class="btn-primary">SALVAR NOME</button>
+                <p id="mensagemNome" aria-live="polite" role="status"></p>
             </form>
         </div>
     </div>
 
-
+    <div id="modalExclusao" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloModalExclusao" hidden>
+        <div class="modal-content">
+            <button type="button" id="fecharModalExclusao" class="modal-close" aria-label="Fechar janela">&times;</button>
+            <p class="orange-text">AÇÃO PERMANENTE</p>
+            <h2 id="tituloModalExclusao">EXCLUIR CONTA</h2>
+            <p>A exclusão remove sua identidade Supabase e os pedidos vinculados. Digite EXCLUIR para confirmar.</p>
+            <form id="formExclusaoConta">
+                <label for="confirmarExclusao">Confirmação</label>
+                <input type="text" id="confirmarExclusao" autocomplete="off" required>
+                <label for="senhaConfirmarExclusao">Senha atual</label>
+                <input type="password" id="senhaConfirmarExclusao" autocomplete="current-password" required>
+                <button type="submit" class="btn-danger">EXCLUIR MINHA CONTA</button>
+                <p id="mensagemExclusao" aria-live="polite" role="status"></p>
+            </form>
+        </div>
+    </div>
 
     <!-- ==================================================
          RODAPÉ

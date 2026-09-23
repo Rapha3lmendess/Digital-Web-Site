@@ -2325,3 +2325,46 @@ footer p {
         font-size: 20px;
     }
 }
+
+/* RF-004: academic simulated checkout */
+.checkout-page {
+    min-height: 70vh;
+    padding: 56px 5%;
+    background: #101010;
+}
+
+.checkout-panel {
+    width: min(100%, 900px);
+    margin: 0 auto;
+    padding: clamp(22px, 5vw, 48px);
+    border: 1px solid #353535;
+    border-radius: 18px;
+    background: #181818;
+    color: #f7f7f7;
+}
+
+.checkout-panel h1 { margin: 8px 0; font-size: clamp(2rem, 5vw, 3.3rem); }
+.checkout-panel h1 span, .checkout-panel .orange-text { color: #ff8a24; }
+.edition-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 28px 0; }
+.edition-card { padding: 22px; border: 1px solid #454545; border-radius: 12px; background: #202020; }
+.edition-card-plus { border-color: #ff8a24; }
+.edition-card h2, .purchase-history h2 { margin-top: 0; }
+.edition-price { color: #ff9b42; font-size: 1.8rem; font-weight: 700; }
+.purchase-form { display: grid; gap: 12px; }
+.purchase-form select { width: 100%; padding: 13px; border: 1px solid #686868; border-radius: 8px; background: #101010; color: #fff; font: inherit; }
+.checkout-total { font-size: 1.2rem; }
+.simulation-notice, .release-notice { padding: 14px; border-left: 4px solid #ff8a24; background: #24201b; }
+.form-message[data-state="error"] { color: #ff7884; }
+.form-message[data-state="success"] { color: #83e2a1; }
+.form-message[data-state="info"] { color: #eee; }
+.purchase-history { margin-top: 36px; padding-top: 24px; border-top: 1px solid #454545; }
+.purchase-receipt { display: grid; gap: 8px; margin: 14px 0; padding: 18px; border: 1px solid #454545; border-radius: 10px; }
+.purchase-receipt h3, .purchase-receipt p { margin: 0; }
+.purchase-receipt a[aria-disabled="true"] { opacity: .65; cursor: not-allowed; }
+.checkout-panel [hidden] { display: none !important; }
+
+@media (max-width: 600px) {
+    .checkout-page { padding: 28px 4%; }
+    .edition-grid { grid-template-columns: 1fr; }
+    .checkout-panel { padding: 22px 18px; }
+}
