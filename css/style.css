@@ -2082,3 +2082,246 @@ footer p {
 
     color: #ff6600;
 }
+/* ====================================
+   DOWNLOAD YOKAI TALES
+==================================== */
+
+.game-hero {
+    width: 100%;
+    min-height: 570px;
+
+    padding: 60px 7%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background:
+        radial-gradient(
+            circle at 80% 50%,
+            rgba(255, 102, 0, 0.20),
+            transparent 42%
+        ),
+        #080808;
+}
+
+.download-container {
+    width: 100%;
+    max-width: 970px;
+
+    padding: 34px 38px 38px;
+
+    background: #191919;
+
+    border: 1px solid #303030;
+    border-radius: 10px;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+.download-header h1 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 34px;
+    font-weight: 800;
+
+    line-height: 1.2;
+}
+
+.download-header h1 span {
+    color: #ff6600;
+}
+
+.download-header p {
+    margin: 14px 0 30px;
+
+    color: #999999;
+
+    font-size: 15px;
+}
+
+.download-content {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 28px;
+
+    align-items: stretch;
+}
+
+
+/* ====================================
+   QUADRO DO JOGO
+==================================== */
+
+.game-download-card {
+    min-height: 270px;
+
+    padding: 28px 24px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #080808;
+
+    border: 1px solid #353535;
+    border-radius: 6px;
+}
+
+.game-download-card h2 {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.game-details {
+    margin-top: 28px;
+}
+
+.game-details p {
+    margin: 0 0 25px;
+
+    color: #999999;
+
+    font-size: 14px;
+}
+
+.game-details strong {
+    color: #ffffff;
+}
+
+
+/* ====================================
+   BOTÃO DOWNLOAD
+==================================== */
+
+.game-download-card .btn-download {
+    width: fit-content;
+
+    margin-top: auto;
+
+    padding: 11px 22px;
+
+    background: #ff6600;
+
+    color: #ffffff;
+
+    border: 1px solid #ff6600;
+    border-radius: 4px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.game-download-card .btn-download:hover {
+    background: transparent;
+
+    color: #ff6600;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(255, 102, 0, 0.18);
+}
+
+
+/* ====================================
+   QUADRO DA IMAGEM
+==================================== */
+
+.game-image-card {
+    min-height: 270px;
+
+    overflow: hidden;
+
+    background: #080808;
+
+    border: 1px solid #353535;
+    border-radius: 6px;
+}
+
+.game-image-card img {
+    width: 100%;
+    height: 100%;
+
+    min-height: 270px;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition: transform 0.4s ease;
+}
+
+.game-image-card:hover img {
+    transform: scale(1.03);
+}
+
+
+/* ====================================
+   RESPONSIVIDADE
+==================================== */
+
+@media (max-width: 800px) {
+
+    .game-hero {
+        padding: 50px 5%;
+    }
+
+    .download-container {
+        padding: 28px;
+    }
+
+    .download-content {
+        grid-template-columns: 1fr;
+    }
+
+    .game-image-card {
+        min-height: 300px;
+    }
+
+    .game-image-card img {
+        min-height: 300px;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    .game-hero {
+        padding: 35px 4%;
+    }
+
+    .download-container {
+        padding: 22px;
+    }
+
+    .download-header h1 {
+        font-size: 27px;
+    }
+
+    .download-header p {
+        font-size: 14px;
+    }
+
+    .game-download-card {
+        min-height: 250px;
+
+        padding: 22px 20px;
+    }
+
+    .game-download-card h2 {
+        font-size: 20px;
+    }
+}
