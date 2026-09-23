@@ -24,7 +24,7 @@ Site acadêmico de apresentação do estúdio fictício Digital Ghost Software e
 1. Configure o projeto Supabase indicado em `js/supabase-config.js` e mantenha no cliente somente a chave publicável/anon. Nunca coloque uma `service_role` key no repositório.
 2. No painel do Supabase, execute [`database/ddl/rf-004-simulated-payments.sql`](database/ddl/rf-004-simulated-payments.sql) no SQL Editor. O script cria a tabela de pedidos, política RLS e cálculo autoritativo dos valores.
 3. Habilite a autenticação por e-mail no Supabase. Para cadastro sem confirmação, ajuste a confirmação de e-mail no painel; caso ela permaneça habilitada, o usuário deve confirmar o e-mail antes do login.
-4. Execute `npm install` e copie `.env.example` para `.env`. Preencha as variáveis Supabase e `ALLOWED_ORIGINS`; `SUPABASE_SERVICE_ROLE_KEY` só fica no servidor.
+4. Execute `npm install` com Node.js 22 ou superior e copie `.env.example` para `.env`. Preencha as variáveis Supabase e `ALLOWED_ORIGINS`; o exemplo já inclui localhost e a origem do GitHub Pages. `SUPABASE_SERVICE_ROLE_KEY` só fica no servidor.
 5. Inicie a API Node.js com `npm start`. Ela valida o token do usuário e permite excluir somente a própria conta. Se frontend e API forem hospedados em origens diferentes, configure `API_BASE_URL` em `js/supabase-config.js` e inclua a origem em `ALLOWED_ORIGINS`.
 6. Sirva a pasta do site por um servidor HTTP estático. Os módulos JavaScript e chamadas Supabase não devem ser executados abrindo páginas como `file://`.
 7. Um arquivo público do jogo ainda não foi disponibilizado. Quando houver uma URL estável de release, configure `GAME_DOWNLOAD_URL` em `js/script.js`; até lá o pedido é registrado, mas o botão de download informa que o arquivo está pendente.

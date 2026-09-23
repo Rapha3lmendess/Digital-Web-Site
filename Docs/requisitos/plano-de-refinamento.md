@@ -39,7 +39,7 @@ Este plano cruza o feedback semanal do professor, as documentações anteriormen
 4. Publicar a API Node.js com secrets no ambiente server-side; nunca expor `SUPABASE_SERVICE_ROLE_KEY` no JavaScript ou Git.
 5. Demonstrar cadastro, login, logout, perfil, atualização de nome/senha, exclusão própria, pedidos Standard/Plus, histórico e tentativas de acesso indevido entre duas contas.
 6. Publicar o binário/release do jogo e então preencher `GAME_DOWNLOAD_URL` em `js/script.js`; testar histórico de download com um arquivo controlado.
-7. O site já possui deploy no GitHub Pages: <https://rapha3lmendess.github.io/Digital-Web-Site/>. Publicar a API Node.js separadamente, informar sua URL, configurar `API_BASE_URL` e `ALLOWED_ORIGINS`, e validar as rotas no deploy HTTPS.
+7. O site já possui deploy no GitHub Pages: <https://rapha3lmendess.github.io/Digital-Web-Site/>. Publicar a API Node.js separadamente, informar sua URL, configurar `API_BASE_URL` e `ALLOWED_ORIGINS`, e validar as rotas no deploy HTTPS. `.env.example` já lista a origem do site para CORS.
 8. Registrar screenshots/logs dos testes funcionais e OWASP, sem senhas, tokens, números de cartão ou dados pessoais.
 
 ## Status de conclusão
