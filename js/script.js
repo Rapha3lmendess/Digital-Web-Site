@@ -20,9 +20,25 @@ import {
 } from "./supabase-config.js";
 
 const USUARIO_LOGADO_KEY = "usuarioLogadoEmail";
+const logoutButton = document.getElementById("logoutButton");
 const LINK_DOWNLOAD = "https://imgs.search.brave.com/P8kr9IV17POo-OX4dYjQyc9_bpKRWvaM4UWrlIGrvVI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/aWNlZ2lmLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAyMy8w/MS9pY2VnaWYtMTY1/LmdpZg.gif";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+if (logoutButton) {
+    logoutButton.hidden = !localStorage.getItem(USUARIO_LOGADO_KEY);
+
+    logoutButton.addEventListener("click", function() {
+        localStorage.removeItem(USUARIO_LOGADO_KEY);
+        localStorage.removeItem("usuarioLogadoNome");
+
+        const paginaLogin = window.location.pathname.includes("/paginas/")
+            ? "login.html"
+            : "paginas/login.html";
+
+        window.location.href = paginaLogin;
+    });
+}
 
 function mostrarMensagem(elemento, texto, cor) {
     if (!elemento) return;
@@ -157,6 +173,9 @@ const downloadButton = document.getElementById("downloadButton");
 const downloadModal = document.getElementById("downloadModal");
 const closeDownloadModal = document.getElementById("closeDownloadModal");
 const formDownloadLogin = document.getElementById("formDownloadLogin");
+const cartaoModal = document.getElementById("cartaoModal");
+const fecharCartaoModal = document.getElementById("fecharCartaoModal");
+const formCadastroCartao = document.getElementById("formCadastroCartao");
 const abrirModalSenha = document.getElementById("abrirModalSenha");
 const modalSenha = document.getElementById("modalSenha");
 const fecharModalSenha = document.getElementById("fecharModalSenha");
@@ -178,9 +197,68 @@ async function buscarUsuarioPorEmail(email) {
         .maybeSingle();
 }
 
+async function buscarCartaoPorEmail(email) {
+    return supabase
+        .from("Cartao")
+        .select("Numero")
+    .eq("dono_cartao", email)
+        .limit(1)
+        .maybeSingle();
+}
+
 function fecharModalDownload() {
     if (downloadModal) {
         downloadModal.hidden = true;
+    }
+}
+
+function fecharModalCartao() {
+    if (cartaoModal) {
+        cartaoModal.hidden = true;
+    }
+}
+
+async function verificarCartaoEContinuar(email) {
+    const mensagemDownload = document.getElementById("mensagemDownload");
+
+    const { data: usuario, error: erroBuscaUsuario } = await buscarUsuarioPorEmail(email);
+
+    if (erroBuscaUsuario) {
+        console.error(erroBuscaUsuario);
+        mostrarMensagem(mensagemDownload, "Erro ao verificar usuário.", "#ff5c6c");
+        return;
+    }
+
+    if (!usuario) {
+        localStorage.removeItem(USUARIO_LOGADO_KEY);
+        localStorage.removeItem("usuarioLogadoNome");
+        mostrarMensagem(mensagemDownload, "Usuário não encontrado.", "#ff5c6c");
+        if (downloadModal) {
+            downloadModal.hidden = false;
+        }
+        document.getElementById("downloadLoginEmail").focus();
+        return;
+    }
+
+    const { data: cartaoEncontrado, error: erroBuscaCartao } = await buscarCartaoPorEmail(email);
+
+    if (erroBuscaCartao) {
+        console.error(erroBuscaCartao);
+        if (downloadModal) {
+            downloadModal.hidden = false;
+        }
+        mostrarMensagem(mensagemDownload, "Erro ao verificar cartão.", "#ff5c6c");
+        return;
+    }
+
+    if (cartaoEncontrado) {
+        abrirLinkDownload();
+        return;
+    }
+
+    if (cartaoModal) {
+        cartaoModal.hidden = false;
+        document.getElementById("numeroCartao").focus();
     }
 }
 
@@ -208,7 +286,7 @@ if (downloadButton) {
                 return;
             }
 
-            abrirLinkDownload();
+            await verificarCartaoEContinuar(emailLogado);
             return;
         }
 
@@ -259,7 +337,102 @@ if (formDownloadLogin) {
 
         localStorage.setItem(USUARIO_LOGADO_KEY, usuarioEncontrado.email_usuario);
         localStorage.setItem("usuarioLogadoNome", usuarioEncontrado.nome_usuario);
-        abrirLinkDownload();
+        fecharModalDownload();
+        await verificarCartaoEContinuar(usuarioEncontrado.email_usuario);
+    });
+}
+
+if (fecharCartaoModal) {
+    fecharCartaoModal.addEventListener("click", fecharModalCartao);
+}
+
+if (cartaoModal) {
+    cartaoModal.addEventListener("click", function(event) {
+        if (event.target === cartaoModal) {
+            fecharModalCartao();
+        }
+    });
+}
+
+if (formCadastroCartao) {
+    formCadastroCartao.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const emailLogado = localStorage.getItem(USUARIO_LOGADO_KEY);
+        const numeroCartao = document.getElementById("numeroCartao").value.trim();
+        const numSeg = document.getElementById("numSeg").value.trim();
+        const nomeCartao = document.getElementById("nomeCartao").value.trim();
+        const mensagem = document.getElementById("mensagemCartao");
+
+        if (!emailLogado) {
+            fecharModalCartao();
+            if (downloadModal) {
+                downloadModal.hidden = false;
+            }
+            document.getElementById("downloadLoginEmail").focus();
+            return;
+        }
+
+        const { data: usuario, error: erroBuscaUsuario } = await buscarUsuarioPorEmail(emailLogado);
+
+        if (erroBuscaUsuario || !usuario) {
+            localStorage.removeItem(USUARIO_LOGADO_KEY);
+            localStorage.removeItem("usuarioLogadoNome");
+            fecharModalCartao();
+            if (downloadModal) {
+                downloadModal.hidden = false;
+            }
+            mostrarMensagem(
+                document.getElementById("mensagemDownload"),
+                "Não foi possível confirmar o usuário.",
+                "#ff5c6c"
+            );
+            document.getElementById("downloadLoginEmail").focus();
+            return;
+        }
+
+        if (!numeroCartao || !numSeg || !nomeCartao) {
+            mostrarMensagem(mensagem, "Preencha todos os campos do cartão.", "#ff5c6c");
+            return;
+        }
+
+        if (!/^\d{16}$/.test(numeroCartao)) {
+            mostrarMensagem(mensagem, "O cartão deve ter exatamente 16 dígitos.", "#ff5c6c");
+            return;
+        }
+
+        if (!/^\d{3}$/.test(numSeg)) {
+            mostrarMensagem(mensagem, "O número de segurança deve ter exatamente 3 dígitos.", "#ff5c6c");
+            return;
+        }
+
+        mostrarMensagem(mensagem, "Registrando cartão...", "#ffffff");
+
+        const { error: erroCadastroCartao } = await supabase
+            .from("Cartao")
+            .insert({
+                Numero: numeroCartao,
+                Num_seg: numSeg,
+                nome_cartao: nomeCartao,
+                dono_cartao: usuario.email_usuario
+            });
+
+        if (erroCadastroCartao) {
+            console.error(erroCadastroCartao);
+            const textoErro = erroCadastroCartao.code === "22003"
+                ? "A coluna Numero precisa aceitar 16 dígitos. Atualize o tipo da coluna no Supabase."
+                : "Erro ao registrar cartão.";
+            mostrarMensagem(mensagem, textoErro, "#ff5c6c");
+            return;
+        }
+
+        mostrarMensagem(mensagem, "Cartão registrado com sucesso!", "#72e6a5");
+        formCadastroCartao.reset();
+
+        setTimeout(function() {
+            fecharModalCartao();
+            abrirLinkDownload();
+        }, 1000);
     });
 }
 

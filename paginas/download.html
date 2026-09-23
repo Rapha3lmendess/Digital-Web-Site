@@ -88,6 +88,10 @@
                 Login
             </a>
 
+            <button type="button" id="logoutButton" class="btn-logout" hidden>
+                Logout
+            </button>
+
         </nav>
 
     </header>
@@ -147,6 +151,30 @@
 
                     <button type="submit" class="btn-primary">CONFIRMAR E BAIXAR</button>
                     <p id="mensagemDownload" aria-live="polite"></p>
+                </form>
+            </div>
+        </div>
+
+        <div id="cartaoModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="cartaoModalTitle" hidden>
+            <div class="modal-content">
+                <button type="button" id="fecharCartaoModal" class="modal-close" aria-label="Fechar janela">&times;</button>
+
+                <p class="orange-text">DOWNLOAD</p>
+                <h2 id="cartaoModalTitle">CADASTRE SEU CARTÃO</h2>
+                <p>Cadastre um cartão para continuar o download.</p>
+
+                <form id="formCadastroCartao">
+                    <label for="numeroCartao">Cartão Número</label>
+                    <input type="text" id="numeroCartao" inputmode="numeric" maxlength="16" minlength="16" pattern="[0-9]{16}" placeholder="Digite os 16 dígitos do cartão" required>
+
+                    <label for="numSeg">Número de segurança</label>
+                    <input type="text" id="numSeg" inputmode="numeric" maxlength="3" minlength="3" pattern="[0-9]{3}" placeholder="Digite os 3 dígitos de segurança" required>
+
+                    <label for="nomeCartao">Nome do proprietário</label>
+                    <input type="text" id="nomeCartao" placeholder="Digite o nome do proprietário" required>
+
+                    <button type="submit" class="btn-primary">CADASTRAR E BAIXAR</button>
+                    <p id="mensagemCartao" aria-live="polite"></p>
                 </form>
             </div>
         </div>

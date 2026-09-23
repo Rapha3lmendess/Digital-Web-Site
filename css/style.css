@@ -213,6 +213,36 @@ img {
 }
 
 
+.btn-logout {
+
+    border: 1px solid #ff5c6c;
+
+    padding: 9px 18px;
+
+    border-radius: 5px;
+
+    background-color: transparent;
+
+    color: #dddddd;
+
+    font: inherit;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+
+.btn-logout:hover {
+
+    background-color: #ff5c6c;
+
+    color: white;
+}
+
+
 /* =========================================================
    TEXTOS LARANJA
 ========================================================= */
