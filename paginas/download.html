@@ -2,59 +2,63 @@
 <html lang="pt-BR">
 
 <head>
+
+    <!-- ==================================================
+         CONFIGURAÇÕES DA PÁGINA
+    =================================================== -->
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="icon" href="../imagens/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../imagens/favicon.ico">
 
-    <title>Yokai Tales | Digital Ghost</title>
+    <title>Download | Digital Ghost</title>
 
     <link rel="stylesheet" href="../css/style.css">
+
 </head>
+
 
 <body>
 
-    <!-- ==================================== -->
-    <!-- NAVBAR -->
-    <!-- ==================================== -->
+
+    <!-- ==================================================
+         MENU PRINCIPAL
+    =================================================== -->
 
     <header class="navbar">
 
-        <div class="logo">
+        <!-- Logo -->
+        <a href="../index.html" class="logo">
             DIGITAL <span>GHOST</span>
-        </div>
+        </a>
 
+
+        <!-- Menu -->
         <nav>
 
             <a href="../index.html">
                 Início
             </a>
 
-            <a href="../pages/yokai-tales.html">
+            <a href="tales.html">
                 Yokai Tales
             </a>
 
-            <a href="../pages/download.html" class="active">
+            <a href="download.html" class="active">
                 Download
             </a>
 
-            <a href="../pages/perfil.html">
+            <a href="perfil.html">
                 Perfil
             </a>
 
-            <a href="../pages/cadastro.html">
+            <a href="cadastro.html">
                 Cadastro
             </a>
 
-            <button
-                type="button"
-                id="logoutButton"
-                class="logout-button"
-                style="display: none;">
-                Sair
-            </button>
-
-            <a href="../pages/login.html" class="login-button">
+            <a href="login.html" class="btn-login">
                 Login
             </a>
 
@@ -63,9 +67,10 @@
     </header>
 
 
-    <!-- ==================================== -->
-    <!-- DOWNLOAD YOKAI TALES -->
-    <!-- ==================================== -->
+
+    <!-- ==================================================
+         CONTEÚDO PRINCIPAL
+    =================================================== -->
 
     <main>
 
@@ -74,15 +79,14 @@
             <div class="download-container">
 
 
-                <!-- ==================================== -->
-                <!-- CABEÇALHO -->
-                <!-- ==================================== -->
+                <!-- ==================================================
+                     TÍTULO E DESCRIÇÃO
+                =================================================== -->
 
-                <div class="download-header">
+                <div class="download-heading">
 
                     <h1>
-                        DOWNLOAD
-                        <span>YOKAI TALES</span>
+                        DOWNLOAD <span>YOKAI TALES</span>
                     </h1>
 
                     <p>
@@ -92,62 +96,64 @@
                 </div>
 
 
-                <!-- ==================================== -->
-                <!-- ÁREA DE DOWNLOAD -->
-                <!-- ==================================== -->
 
-                <div class="download-content">
+                <!-- ==================================================
+                     CONTEÚDO DO DOWNLOAD
+                =================================================== -->
+
+                <div class="download-content-wrapper">
 
 
-                    <!-- ==================================== -->
-                    <!-- QUADRO DO JOGO -->
-                    <!-- ==================================== -->
+                    <!-- ==================================================
+                         CARD DO JOGO
+                    =================================================== -->
 
-                    <div class="game-download-card">
+                    <div class="download-card">
 
                         <h2>
                             YOKAI TALES
                         </h2>
 
 
-                        <div class="game-details">
+                        <div class="download-details">
 
                             <p>
-                                <strong>Versão:</strong>
-                                1.0
+                                <strong>Versão:</strong> 1.0
                             </p>
 
                             <p>
-                                <strong>Plataforma:</strong>
-                                Windows
+                                <strong>Plataforma:</strong> Windows
                             </p>
 
                         </div>
 
 
+                        <!-- Botão de download -->
                         <button
                             type="button"
                             id="downloadButton"
-                            class="btn-download">
-
+                            class="download-button"
+                        >
                             BAIXAR JOGO
-
                         </button>
 
                     </div>
 
 
-                    <!-- ==================================== -->
-                    <!-- QUADRO DA IMAGEM -->
-                    <!-- ==================================== -->
 
-                    <div class="game-image-card">
+                    <!-- ==================================================
+                         IMAGEM DO JOGO
+                    =================================================== -->
+
+                    <div class="download-image">
 
                         <img
-                            src="../imagens/ESSE_NEGOCIO_TA_COISADO.png"
-                            alt="Imagem de teste">
+                            src="../imagens/yokaidowloadfoto.png"
+                            alt="Capa do jogo Yokai Tales"
+                        >
 
                     </div>
+
 
                 </div>
 
@@ -156,185 +162,90 @@
         </section>
 
 
-        <!-- ==================================== -->
-        <!-- MODAL DE LOGIN PARA DOWNLOAD -->
-        <!-- ==================================== -->
+
+        <!-- ==================================================
+             MODAL DE LOGIN
+        =================================================== -->
 
         <div
             id="downloadModal"
             class="modal"
-            style="display: none;">
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="downloadModalTitle"
+            hidden
+        >
 
             <div class="modal-content">
 
+                <!-- Fechar -->
                 <button
                     type="button"
+                    id="closeDownloadModal"
                     class="modal-close"
-                    id="fecharDownloadModal">
-
+                    aria-label="Fechar janela"
+                >
                     &times;
-
                 </button>
 
 
-                <h2>
-                    Login para Download
+                <p class="orange-text">
+                    DOWNLOAD
+                </p>
+
+
+                <h2 id="downloadModalTitle">
+                    CONFIRME SEU LOGIN
                 </h2>
 
+
                 <p>
-                    Entre na sua conta para continuar.
+                    Entre na sua conta para continuar o download.
                 </p>
 
 
                 <form id="formDownloadLogin">
 
+                    <!-- E-mail -->
+                    <label for="downloadLoginEmail">
+                        E-mail
+                    </label>
 
-                    <div class="form-group">
-
-                        <label for="downloadLoginEmail">
-                            E-mail
-                        </label>
-
-                        <input
-                            type="email"
-                            id="downloadLoginEmail"
-                            name="email"
-                            placeholder="Digite seu e-mail"
-                            required>
-
-                    </div>
+                    <input
+                        type="email"
+                        id="downloadLoginEmail"
+                        placeholder="Digite seu e-mail"
+                        required
+                    >
 
 
-                    <div class="form-group">
+                    <!-- Senha -->
+                    <label for="downloadLoginSenha">
+                        Senha
+                    </label>
 
-                        <label for="downloadLoginSenha">
-                            Senha
-                        </label>
-
-                        <input
-                            type="password"
-                            id="downloadLoginSenha"
-                            name="senha"
-                            placeholder="Digite sua senha"
-                            required>
-
-                    </div>
+                    <input
+                        type="password"
+                        id="downloadLoginSenha"
+                        placeholder="Digite sua senha"
+                        required
+                    >
 
 
+                    <!-- Confirmar -->
                     <button
                         type="submit"
-                        class="btn-primary">
-
-                        ENTRAR
-
+                        class="btn-primary"
+                    >
+                        CONFIRMAR E BAIXAR
                     </button>
 
 
+                    <!-- Mensagem -->
                     <p
                         id="mensagemDownload"
-                        class="mensagem">
-                    </p>
-
-                </form>
-
-            </div>
-
-        </div>
-
-
-        <!-- ==================================== -->
-        <!-- MODAL DE CADASTRO DO CARTÃO -->
-        <!-- ==================================== -->
-
-        <div
-            id="cartaoModal"
-            class="modal"
-            style="display: none;">
-
-            <div class="modal-content">
-
-                <button
-                    type="button"
-                    class="modal-close"
-                    id="fecharCartaoModal">
-
-                    &times;
-
-                </button>
-
-
-                <h2>
-                    Informações
-                </h2>
-
-                <p>
-                    Preencha os dados solicitados para continuar.
-                </p>
-
-
-                <form id="formCadastroCartao">
-
-
-                    <div class="form-group">
-
-                        <label for="numeroCartao">
-                            Número do cartão
-                        </label>
-
-                        <input
-                            type="text"
-                            id="numeroCartao"
-                            name="numeroCartao"
-                            placeholder="0000 0000 0000 0000"
-                            maxlength="19">
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="numSeg">
-                            Código de segurança
-                        </label>
-
-                        <input
-                            type="text"
-                            id="numSeg"
-                            name="numSeg"
-                            placeholder="000"
-                            maxlength="4">
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="nomeCartao">
-                            Nome
-                        </label>
-
-                        <input
-                            type="text"
-                            id="nomeCartao"
-                            name="nomeCartao"
-                            placeholder="Nome do titular">
-
-                    </div>
-
-
-                    <button
-                        type="submit"
-                        class="btn-primary">
-
-                        CONTINUAR
-
-                    </button>
-
-
-                    <p
-                        id="mensagemCartao"
-                        class="mensagem">
-                    </p>
+                        aria-live="polite"
+                    ></p>
 
                 </form>
 
@@ -343,34 +254,15 @@
         </div>
 
     </main>
+    <!-- ==================================================
+         JAVASCRIPT
+    =================================================== -->
 
+    <script
+        type="module"
+        src="../js/script.js"
+    ></script>
 
-    <!-- ==================================== -->
-    <!-- FOOTER -->
-    <!-- ==================================== -->
-
-    <footer>
-
-        <div class="footer-logo">
-            DIGITAL <span>GHOST</span>
-        </div>
-
-        <p>
-            Projeto acadêmico desenvolvido para fins educacionais.
-        </p>
-
-        <small>
-            © 2026 Digital Ghost Software
-        </small>
-
-    </footer>
-
-
-    <!-- ==================================== -->
-    <!-- JAVASCRIPT -->
-    <!-- ==================================== -->
-
-    <script src="../js/script.js"></script>
 
 </body>
 
